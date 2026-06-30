@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
-import 'home.dart';
+import 'screens/splash/splash_screen.dart';
 
 void main() {
- runApp (MyApp());
+  runApp(const MindnoteAI());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp ({super.key});
+class MindnoteAI extends StatelessWidget {
+  const MindnoteAI({super.key});
 
- @override
+  @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home:Homepage(),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'MindnoteAI',
+      theme: ThemeData(
+        useMaterial3: true,
+        colorSchemeSeed: Colors.blue,
+      ),
+      home: const SplashScreen(),
     );
   }
 }
