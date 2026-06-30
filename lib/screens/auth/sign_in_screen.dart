@@ -9,7 +9,7 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  bool isHidden = false;
+  bool isHidden = true;
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -95,12 +95,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
               const SizedBox(height: 20),
 
               /// Password
-              const TextField(
-                obscureText: true,
+              TextField(
+                obscureText: isHidden,
                 decoration: InputDecoration(
                   labelText: "Password",
-                  prefixIcon: Icon(Icons.lock_outline),
-                  suffixIcon: Icon(Icons.visibility_off_outlined),
+                  prefixIcon: const Icon(Icons.lock_outline), suffixIcon: IconButton(
+                    icon: Icon(
+                      isHidden
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        isHidden = !isHidden;
+                      });
+                    },
+                  ),
+
+                 
                 ),
               ),
 
@@ -108,7 +120,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
               /// Confirm Password
               TextField(
-                obscureText: !isHidden,
+                obscureText:isHidden,
                 decoration: InputDecoration(
                   labelText: "Confirm Password",
                   prefixIcon: const Icon(Icons.lock_outline),
