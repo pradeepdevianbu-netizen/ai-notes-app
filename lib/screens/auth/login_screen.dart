@@ -1,3 +1,4 @@
+import 'package:first_app/screens/auth/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/constants/app_colors.dart';
 
@@ -108,8 +109,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   const Text("Don't have an account? "),
                   TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
+                    onPressed: () {Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const SignUpScreen(),
+                      ),
+                    );
+                      
                     },
                     child: const Text("Sign Up"),
                   ),
