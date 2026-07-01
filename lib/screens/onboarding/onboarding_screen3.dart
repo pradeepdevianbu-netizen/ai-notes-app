@@ -1,7 +1,6 @@
 import 'package:first_app/constants/app_colors.dart';
-import 'package:first_app/screens/auth/sign_in_screen.dart';
+import 'package:first_app/screens/auth/sign_up_screen.dart';
 import 'package:flutter/material.dart';
-
 
 class OnboardingScreen3 extends StatelessWidget {
   const OnboardingScreen3({super.key});
@@ -48,7 +47,8 @@ class OnboardingScreen3 extends StatelessWidget {
                     borderRadius: BorderRadius.circular(28),
                     boxShadow: [
                       BoxShadow(
-                        color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                        color:
+                            theme.colorScheme.primary.withValues(alpha: 0.25),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -70,8 +70,8 @@ class OnboardingScreen3 extends StatelessWidget {
                   "Stay Organized,\nEvery Day",
                   textAlign: TextAlign.center,
                   style: theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
 
@@ -136,4 +136,3 @@ class OnboardingScreen3 extends StatelessWidget {
     );
   }
 }
-
