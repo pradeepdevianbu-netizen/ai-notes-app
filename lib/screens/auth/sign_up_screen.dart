@@ -137,7 +137,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
               ),
 
-              const SizedBox(height: 35),
+              const SizedBox(height: 36),
+                  //height changed
 
               /// Create Account Button
               SizedBox(
