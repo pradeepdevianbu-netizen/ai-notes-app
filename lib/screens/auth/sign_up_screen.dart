@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first_app/constants/app_colors.dart';
 import 'package:first_app/screens/auth/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,55 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool isPasswordHidden = true;
   bool isConfirmPasswordHidden = true;
 
+    // Firebase Auth
+final FirebaseAuth _auth = FirebaseAuth.instance;
+
+// Text Controllers
+final TextEditingController fullNameController = TextEditingController();
+final TextEditingController emailController = TextEditingController();
+final TextEditingController passwordController = TextEditingController();
+final TextEditingController confirmPasswordController =
+    TextEditingController();
+
+
+Future<void> signUp() async {
+  if (passwordController.text.trim() !=
+      confirmPasswordController.text.trim()) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Passwords do not match"),
+      ),
+    );
+    return;
+  }
+
+  try {
+    await _auth.createUserWithEmailAndPassword(
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Account Created Successfully"),
+      ),
+    );
+
+    fullNameController.clear();
+    emailController.clear();
+    passwordController.clear();
+    confirmPasswordController.clear();
+
+    // TODO: Navigate to Home Screen
+  } on FirebaseAuthException catch (e) {
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(e.message ?? "Something went wrong"),
+      ),
+    );
+  }
+}
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -73,19 +123,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
               const SizedBox(height: 40),
 
               /// Full Name
-              const TextField(
-                decoration: InputDecoration(
+               TextField(
+                controller: fullNameController,
+                decoration: const InputDecoration(
                   labelText: "Full Name",
                   prefixIcon: Icon(Icons.person_outline),
+                  
                 ),
               ),
 
               const SizedBox(height: 20),
 
               /// Email
-              const TextField(
+               TextField(
+                controller: emailController,
                 keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "Email",
                   prefixIcon: Icon(Icons.email_outlined),
                 ),
@@ -95,6 +148,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
               /// Password
               TextField(
+                controller: passwordController,
                 obscureText: isPasswordHidden,
                 decoration: InputDecoration(
                   labelText: "Password",
@@ -118,6 +172,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
               /// Confirm Password
               TextField(
+                controller: confirmPasswordController,
                 obscureText: isConfirmPasswordHidden,
                 decoration: InputDecoration(
                   labelText: "Confirm Password",
@@ -145,7 +200,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: signUp,
                   child: const Text("Create Account"),
                 ),
               ),
