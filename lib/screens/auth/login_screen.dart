@@ -1,15 +1,62 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first_app/screens/auth/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 
+
+
+final FirebaseAuth _auth = FirebaseAuth.instance;
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+  
+  
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
+  
+
+
 }
 
 class _LoginScreenState extends State<LoginScreen> {
   bool isPasswordHidden = true;
+
+  @override
+void dispose() {
+  emailController.dispose();
+  passwordController.dispose();
+  super.dispose();
+}
+  final TextEditingController emailController = TextEditingController();
+final TextEditingController passwordController = TextEditingController();
+
+Future<void> signIn() async {
+  try {
+    await _auth.signInWithEmailAndPassword(
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Login Successful"),
+      ),
+    );
+
+    // Navigate to Home Screen
+    // Navigator.pushReplacement(
+    //   context,
+    //   MaterialPageRoute(builder: (_) => const HomeScreen()),
+    // );
+
+  } on FirebaseAuthException catch (e) {
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(e.message ?? "Login Failed"),
+      ),
+    );
+  }}
 
   @override
   Widget build(BuildContext context) {
@@ -46,9 +93,10 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 50),
 
               /// Email
-              const TextField(
+               TextField(
+                 controller: emailController,
                 keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "Email",
                   prefixIcon: Icon(Icons.email_outlined),
                 ),
@@ -58,6 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
               /// Password
               TextField(
+                controller: passwordController,
                 obscureText: isPasswordHidden,
                 decoration: InputDecoration(
                   labelText: "Password",
@@ -95,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: signIn,
                   child: const Text("Login"),
                 ),
               ),
