@@ -124,7 +124,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
               /// Department
               DropdownButtonFormField<String>(
-                value: selectedDepartment,
+                initialValue: selectedDepartment,
                 decoration: const InputDecoration(
                   labelText: "Department",
                   prefixIcon: Icon(Icons.account_tree_outlined),
@@ -172,7 +172,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
               /// Section
               DropdownButtonFormField<String>(
-                value: selectedSection,
+                initialValue: selectedSection,
                 decoration: const InputDecoration(
                   labelText: "Section",
                   prefixIcon: Icon(Icons.groups_outlined),

@@ -55,7 +55,7 @@ class OnboardingScreen3 extends StatelessWidget {
                     ],
                   ),
                   child: const Icon(
-                    Icons.edit_note_rounded,
+                   Icons.rocket_launch_rounded,
                     color: Colors.white,
                     size: 60,
                   ),

@@ -46,7 +46,7 @@ class OnboardingScreen extends StatelessWidget {
                         ),
                       ]),
                   child: const Icon(
-                    Icons.edit_note_rounded,
+                    Icons.rocket_launch_rounded,
                     size: 60,
                     color: Colors.white,
                   ),
@@ -58,7 +58,7 @@ class OnboardingScreen extends StatelessWidget {
               /// Title
               Center(
                 child: Text(
-                  "Welcome to\nMindNote AI",
+                  "Welcome to\nCampusX",
                   textAlign: TextAlign.center,
                   style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
