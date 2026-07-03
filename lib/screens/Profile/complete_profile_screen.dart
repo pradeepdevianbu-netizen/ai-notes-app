@@ -16,6 +16,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final TextEditingController aboutController = TextEditingController();
 
   Future<void> saveProfile() async {
+    try{
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) return;
@@ -30,7 +31,11 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       'about': aboutController.text.trim(),
       'createdAt': FieldValue.serverTimestamp(),
     });
+  } catch (e) {
+    debugPrint(e.toString());
   }
+  }
+
 
   String? selectedDepartment;
   String? selectedYear;
@@ -234,6 +239,20 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                   height: 56,
                   child: ElevatedButton(
                     onPressed: () async {
+                      if (fullNameController.text.trim().isEmpty ||
+                          collegeController.text.trim().isEmpty ||
+                          selectedDepartment == null ||
+                          selectedYear == null ||
+                          selectedSection == null ||
+                          aboutController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Please fill all the fields"),
+                          ),
+                        );
+                        return;
+                      }
+
                       await saveProfile();
 
                       Navigator.pushReplacement(
