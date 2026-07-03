@@ -1,62 +1,65 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:first_app/screens/Profile/complete_profile_screen.dart';
 import 'package:first_app/screens/auth/sign_up_screen.dart';
+
 import 'package:flutter/material.dart';
-
-
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
-  
-  
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
-  
-
-
 }
 
 class _LoginScreenState extends State<LoginScreen> {
   bool isPasswordHidden = true;
 
   @override
-void dispose() {
-  emailController.dispose();
-  passwordController.dispose();
-  super.dispose();
-}
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   final TextEditingController emailController = TextEditingController();
-final TextEditingController passwordController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
-Future<void> signIn() async {
-  try {
-    await _auth.signInWithEmailAndPassword(
-      email: emailController.text.trim(),
-      password: passwordController.text.trim(),
-    );
+  Future<void> signIn() async {
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Login Successful"),
-      ),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Login Successful"),
+        ),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              const CompleteProfileScreen(), // Change this to your next screen
+        ),
+      );
 
-    // Navigate to Home Screen
-    // Navigator.pushReplacement(
-    //   context,
-    //   MaterialPageRoute(builder: (_) => const HomeScreen()),
-    // );
-
-  } on FirebaseAuthException catch (e) {
-    // ignore: use_build_context_synchronously
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(e.message ?? "Login Failed"),
-      ),
-    );
-  }}
+      // Navigate to Home Screen
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(builder: (_) => const HomeScreen()),
+      // );
+    } on FirebaseAuthException catch (e) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message ?? "Login Failed"),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,8 +96,8 @@ Future<void> signIn() async {
               const SizedBox(height: 50),
 
               /// Email
-               TextField(
-                 controller: emailController,
+              TextField(
+                controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
                   labelText: "Email",
@@ -157,13 +160,13 @@ Future<void> signIn() async {
                 children: [
                   const Text("Don't have an account? "),
                   TextButton(
-                    onPressed: () {Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const SignUpScreen(),
-                      ),
-                    );
-                      
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SignUpScreen(),
+                        ),
+                      );
                     },
                     child: const Text("Sign Up"),
                   ),
