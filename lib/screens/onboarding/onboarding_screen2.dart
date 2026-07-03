@@ -49,7 +49,7 @@ class OnboardingScreen2 extends StatelessWidget {
                     ],
                   ),
                   child: const Icon(
-                    Icons.rocket_launch_rounded,
+                    Icons.search_rounded,
                     color: Colors.white,
                     size: 60,
                   ),
@@ -61,7 +61,7 @@ class OnboardingScreen2 extends StatelessWidget {
               /// Title
               Center(
                 child: Text(
-                  "AI That Understands\nYour Notes",
+                " Discover Students",
                   textAlign: TextAlign.center,
                   style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
@@ -74,7 +74,7 @@ class OnboardingScreen2 extends StatelessWidget {
               /// Description
               Center(
                 child: Text(
-                  "Summarize, rewrite,\ntranslate and organize\nyour notes with AI.",
+                 "Search for classmates\nby name, department,\nor year and explore\nstudent profiles\neasily.",
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium,
                 ),

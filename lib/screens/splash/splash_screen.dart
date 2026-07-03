@@ -62,7 +62,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   const SizedBox(height: 28),
 
                   Text(
-                    "MindnoteAI",
+                    "CampusX",
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
@@ -72,7 +72,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   const SizedBox(height: 8),
 
                   Text(
-                    "Your thoughts, organized,",
+                    "Connect. Collaborate. Grow.",
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: AppColors.textSecondary,
                         ),

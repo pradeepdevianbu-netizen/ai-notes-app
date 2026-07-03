@@ -67,7 +67,7 @@ class OnboardingScreen3 extends StatelessWidget {
               /// Title
               Center(
                 child: Text(
-                  "Stay Organized,\nEvery Day",
+             "  Build Your Network",
                   textAlign: TextAlign.center,
                   style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,

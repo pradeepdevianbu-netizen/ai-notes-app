@@ -1,17 +1,36 @@
+import 'package:first_app/screens/home/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
   const CompleteProfileScreen({super.key});
 
   @override
-  State<CompleteProfileScreen> createState() =>
-      _CompleteProfileScreenState();
+  State<CompleteProfileScreen> createState() => _CompleteProfileScreenState();
 }
 
 class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController collegeController = TextEditingController();
   final TextEditingController aboutController = TextEditingController();
+
+  Future<void> saveProfile() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+      'uid': user.uid,
+      'name': fullNameController.text.trim(),
+      'college': collegeController.text.trim(),
+      'department': selectedDepartment,
+      'year': selectedYear,
+      'section': selectedSection,
+      'about': aboutController.text.trim(),
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
 
   String? selectedDepartment;
   String? selectedYear;
@@ -64,7 +83,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-
               /// Profile Photo
               Stack(
                 children: [
@@ -148,7 +166,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
               /// Year
               DropdownButtonFormField<String>(
-                value: selectedYear,
+                initialValue: selectedYear,
                 decoration: const InputDecoration(
                   labelText: "Year",
                   prefixIcon: Icon(Icons.calendar_today_outlined),
@@ -212,18 +230,21 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
               /// Continue Button
               SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Save Profile
-                  },
-                  child: const Text(
-                    "Continue",
-                    style: TextStyle(fontSize: 17),
-                  ),
-                ),
-              ),
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await saveProfile();
+
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const HomeScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text("Continue"),
+                  )),
 
               const SizedBox(height: 20),
 

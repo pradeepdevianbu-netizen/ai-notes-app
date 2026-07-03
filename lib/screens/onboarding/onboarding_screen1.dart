@@ -46,7 +46,7 @@ class OnboardingScreen extends StatelessWidget {
                         ),
                       ]),
                   child: const Icon(
-                    Icons.rocket_launch_rounded,
+                    Icons.groups_rounded,
                     size: 60,
                     color: Colors.white,
                   ),
@@ -71,7 +71,7 @@ class OnboardingScreen extends StatelessWidget {
               /// Description
               Center(
                 child: Text(
-                  "Capture your thoughts,\nideas and inspirations\nwith AI assistance.",
+             "Find and connect with\nstudents from your\ncollege, department,\nand year—all in\none place.",
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium,
                 ),
