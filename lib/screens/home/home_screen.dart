@@ -1,3 +1,5 @@
+import 'package:first_app/screens/home/widgets/ai_assistant_card.dart';
+import 'package:first_app/screens/home/widgets/department_card.dart';
 import 'package:flutter/material.dart';
 
 import 'widgets/home_app_bar.dart';
@@ -35,25 +37,14 @@ class HomeScreen extends StatelessWidget {
               /// Search Bar
               const HomeSearchBar(),
 
-              const SizedBox(height: 24),
-
-              /// AI Assistant Card (Temporary)
-             
-
               const SizedBox(height: 30),
 
-              /// Departments Title
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  "Departments",
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+              const AIAssistantCard(),
 
+              const SizedBox(height: 24),
+
+              /// Departments Title
+            const DepartmentCard(title: '', icon: null, studentCount: null,),
               const SizedBox(height: 16),
 
               // Department Grid
