@@ -35,7 +35,7 @@ class AIAssistantCard extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(width: 16),
+              SizedBox(width: 15),
 
               Expanded(
                 child: Column(
