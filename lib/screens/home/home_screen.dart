@@ -1,56 +1,65 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'widgets/home_app_bar.dart';
+import 'widgets/home_search_bar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-
-    final uid = FirebaseAuth.instance.currentUser!.uid;
+    // Temporary data
+    // Later this value will come from Firebase Firestore.
+    const String userName = "Pradeep";
 
     return Scaffold(
       body: SafeArea(
-        child: FutureBuilder<DocumentSnapshot>(
-          future: FirebaseFirestore.instance
-              .collection('users')
-              .doc(uid)
-              .get(),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// App Bar
+              HomeAppBar(
+                userName: userName,
+                onNotificationTap: () {
+                  // TODO: Open Notification Screen
+                },
+                onProfileTap: () {
+                  // TODO: Open Profile Screen
+                },
+              ),
 
-          builder: (context, snapshot) {
+              const SizedBox(height: 24),
 
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
+              /// Search Bar
+              const HomeSearchBar(),
 
-            if (!snapshot.hasData || !snapshot.data!.exists) {
-              return const Center(
-                child: Text("User not found"),
-              );
-            }
+              const SizedBox(height: 24),
 
-            final data =
-                snapshot.data!.data() as Map<String, dynamic>;
+              /// AI Assistant Card (Temporary)
+             
 
-            return Column(
-              children: [
+              const SizedBox(height: 30),
 
-                HomeAppBar(
-                  userName: data['name']
+              /// Departments Title
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  "Departments",
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
+              ),
 
-                const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
-                const Text("Home Screen"),
-
-              ],
-            );
-          },
+              // Department Grid
+              // We'll build this next.
+            ],
+          ),
         ),
       ),
     );
