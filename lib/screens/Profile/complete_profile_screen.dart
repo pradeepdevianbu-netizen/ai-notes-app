@@ -15,27 +15,29 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final TextEditingController collegeController = TextEditingController();
   final TextEditingController aboutController = TextEditingController();
 
-  Future<void> saveProfile() async {
-    try{
-    final user = FirebaseAuth.instance.currentUser;
+  Future<bool> saveProfile() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
 
-    if (user == null) return;
+      if (user == null) return false;
 
-    await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-      'uid': user.uid,
-      'name': fullNameController.text.trim(),
-      'college': collegeController.text.trim(),
-      'department': selectedDepartment,
-      'year': selectedYear,
-      'section': selectedSection,
-      'about': aboutController.text.trim(),
-      'createdAt': FieldValue.serverTimestamp(),
-    });
-  } catch (e) {
-    debugPrint(e.toString());
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'uid': user.uid,
+        'email': user.email,
+        'name': fullNameController.text.trim(),
+        'college': collegeController.text.trim(),
+        'department': selectedDepartment,
+        'year': selectedYear,
+        'section': selectedSection,
+        'about': aboutController.text.trim(),
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
-  }
-
 
   String? selectedDepartment;
   String? selectedYear;
@@ -253,14 +255,16 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                         return;
                       }
 
-                      await saveProfile();
+                      bool success = await saveProfile();
 
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const HomeScreen(),
-                        ),
-                      );
+                      if (success) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const HomeScreen(),
+                          ),
+                        );
+                      }
                     },
                     child: const Text("Continue"),
                   )),
