@@ -1,8 +1,8 @@
 import 'package:first_app/screens/home/widgets/department_grid.dart';
 import 'package:flutter/material.dart';
 
-class DepartmentScreen extends StatelessWidget {
-  const DepartmentScreen({super.key});
+class Departmentcard extends StatelessWidget {
+  const Departmentcard({super.key});
 
   @override
   Widget build(BuildContext context) {
