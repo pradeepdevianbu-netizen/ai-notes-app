@@ -1,6 +1,4 @@
 import 'package:first_app/screens/home/widgets/ai_assistant_card.dart';
-import 'package:first_app/screens/home/widgets/department_card.dart';
-import 'package:first_app/screens/home/widgets/department_grid.dart';
 import 'package:first_app/screens/home/widgets/department_screen.dart';
 import 'package:flutter/material.dart';
 

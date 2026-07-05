@@ -1,13 +1,13 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-class DepartmentCard extends StatelessWidget {
+class Departmentgridcolor extends StatelessWidget {
   final String title;
   final IconData icon;
   final Color color;
   final VoidCallback onTap;
 
-  const DepartmentCard({
+  const Departmentgridcolor({
     super.key,
     required this.title,
     required this.icon,

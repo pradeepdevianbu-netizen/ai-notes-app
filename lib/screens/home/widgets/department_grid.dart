@@ -1,5 +1,6 @@
+import 'package:first_app/screens/home/widgets/department_gridcolor.dart';
 import 'package:flutter/material.dart';
-import 'department_card.dart';
+
 
 class DepartmentGrid extends StatelessWidget {
   const DepartmentGrid({super.key});
@@ -16,37 +17,37 @@ class DepartmentGrid extends StatelessWidget {
         mainAxisSpacing: 16,
         childAspectRatio: 0.9,
         children: [
-          DepartmentCard(
+          Departmentgridcolor(
             title: "AI & DS",
             icon: Icons.auto_awesome,
             color: Colors.blue,
             onTap: () {},
           ),
-          DepartmentCard(
+          Departmentgridcolor(
             title: "CSE",
             icon: Icons.terminal,
             color: Colors.cyan,
             onTap: () {},
           ),
-          DepartmentCard(
+          Departmentgridcolor(
             title: "IT",
             icon: Icons.hub,
             color: Colors.green,
             onTap: () {},
           ),
-          DepartmentCard(
+          Departmentgridcolor(
             title: "ECE",
             icon: Icons.developer_board,
             color: Colors.orange,
             onTap: () {},
           ),
-          DepartmentCard(
+          Departmentgridcolor(
             title: "EEE",
             icon:Icons.bolt,
             color: Colors.amber,
             onTap: () {},
           ),
-          DepartmentCard(
+          Departmentgridcolor(
             title: "BME",
             icon: Icons.science,
             color: Colors.purple,
