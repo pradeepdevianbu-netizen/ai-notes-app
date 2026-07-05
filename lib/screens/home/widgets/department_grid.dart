@@ -18,37 +18,37 @@ class DepartmentGrid extends StatelessWidget {
         children: [
           DepartmentCard(
             title: "AI & DS",
-            icon: Icons.psychology,
+            icon: Icons.auto_awesome,
             color: Colors.blue,
             onTap: () {},
           ),
           DepartmentCard(
             title: "CSE",
-            icon: Icons.computer,
+            icon: Icons.terminal,
             color: Colors.cyan,
             onTap: () {},
           ),
           DepartmentCard(
             title: "IT",
-            icon: Icons.laptop_mac,
+            icon: Icons.hub,
             color: Colors.green,
             onTap: () {},
           ),
           DepartmentCard(
             title: "ECE",
-            icon: Icons.memory,
+            icon: Icons.developer_board,
             color: Colors.orange,
             onTap: () {},
           ),
           DepartmentCard(
             title: "EEE",
-            icon: Icons.electrical_services,
+            icon:Icons.bolt,
             color: Colors.amber,
             onTap: () {},
           ),
           DepartmentCard(
             title: "BME",
-            icon: Icons.biotech,
+            icon: Icons.science,
             color: Colors.purple,
             onTap: () {},
           ),
