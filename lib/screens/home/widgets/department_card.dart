@@ -1,8 +1,10 @@
-import 'package:first_app/screens/home/widgets/department_grid.dart';
+
+import 'package:first_app/screens/home/widgets/department_screen.dart';
 import 'package:flutter/material.dart';
 
 class Departmentcard extends StatelessWidget {
   const Departmentcard({super.key});
+
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +16,7 @@ class Departmentcard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => const DepartmentGrid(),
+              builder: (_) =>  DepartmentsScreen(),
             ),
           );
         },

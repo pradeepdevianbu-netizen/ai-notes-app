@@ -12,7 +12,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Temporary data
     // Later this value will come from Firebase Firestore.
-    const String userName = "Pradeep";
+     String username="username";
 
     return Scaffold(
       body: SafeArea(
@@ -23,7 +23,7 @@ class HomeScreen extends StatelessWidget {
             children: [
               /// App Bar
               HomeAppBar(
-                userName: userName,
+                username: username,
                 onNotificationTap: () {
                   // TODO: Open Notification Screen
                 },
@@ -43,7 +43,7 @@ class HomeScreen extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              const DepartmentScreen()
+              const Departmentcard()
              
               // Department Grid
               // We'll build this next.

@@ -7,7 +7,7 @@ class Departmentgridcolor extends StatelessWidget {
   final Color color;
   final VoidCallback onTap;
 
-  const Departmentgridcolor({
+   const Departmentgridcolor({
     super.key,
     required this.title,
     required this.icon,
@@ -91,7 +91,7 @@ class Departmentgridcolor extends StatelessWidget {
                         "Browse Students",
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
-                          fontSize: 12,
+                          fontSize: 15,
                         ),
                       ),
                       const SizedBox(height: 12),

@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class HomeAppBar extends StatelessWidget {
   const HomeAppBar({
     super.key,
-    required this.userName,
+    required this.username,
     this.profileImageUrl,
     this.onNotificationTap,
     this.onProfileTap,
   });
 
-  final String userName;
+  final String username;
   final String? profileImageUrl;
   final VoidCallback? onNotificationTap;
   final VoidCallback? onProfileTap;
@@ -47,7 +47,7 @@ class HomeAppBar extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  userName,
+                  username,
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
