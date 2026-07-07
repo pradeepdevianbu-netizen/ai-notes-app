@@ -44,3 +44,6 @@ app.*.map.json
 serviceAccountKey.json
 tools/serviceAccountKey.json
 tools/*.json
+firebase_upload/serviceAccountKey.json.json
+firebase_upload/*.json
+serviceAccountKey.json
