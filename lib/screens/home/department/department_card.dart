@@ -1,5 +1,5 @@
 
-import 'package:first_app/screens/home/widgets/department_screen.dart';
+import 'package:first_app/screens/home/department/department_screen.dart';
 import 'package:flutter/material.dart';
 
 class Departmentcard extends StatelessWidget {

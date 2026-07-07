@@ -1,5 +1,5 @@
 import 'package:first_app/screens/home/widgets/ai_assistant_card.dart';
-import 'package:first_app/screens/home/widgets/department_card.dart';
+import 'package:first_app/screens/home/department/department_card.dart';
 import 'package:flutter/material.dart';
 
 import 'widgets/home_app_bar.dart';

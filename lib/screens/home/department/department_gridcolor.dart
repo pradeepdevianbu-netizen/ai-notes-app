@@ -33,8 +33,8 @@ class Departmentgridcolor extends StatelessWidget {
               onTap: onTap,
               child: BackdropFilter(
                 filter: ImageFilter.blur(
-                  sigmaX: 12,
-                  sigmaY: 12,
+                  sigmaX: 6,
+                  sigmaY: 6,
                 ),
                 child: Container(
                   decoration: BoxDecoration(
@@ -43,8 +43,8 @@ class Departmentgridcolor extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        color.withOpacity(.35),
-                        Colors.white.withOpacity(.08),
+                        color.withOpacity(.99),
+                        Colors.white.withOpacity(.25),
                       ],
                     ),
                     border: Border.all(

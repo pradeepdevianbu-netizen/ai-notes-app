@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first_app/screens/Profile/complete_profile_screen.dart';
 import 'package:first_app/screens/auth/sign_up_screen.dart';
+import 'package:first_app/screens/home/home_screen.dart';
 
 import 'package:flutter/material.dart';
 
@@ -42,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
         context,
         MaterialPageRoute(
           builder: (_) =>
-              const CompleteProfileScreen(), // Change this to your next screen
+              const CompleteProfileScreen (), // Change this to your next screen
         ),
       );
 

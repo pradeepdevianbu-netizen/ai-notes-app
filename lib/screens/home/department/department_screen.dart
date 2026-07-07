@@ -1,6 +1,7 @@
+import 'package:first_app/screens/home/department/years_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/models/department.dart';
-import 'package:first_app/screens/home/widgets/department_gridcolor.dart';
+import 'package:first_app/screens/home/department/department_gridcolor.dart';
 
 class DepartmentsScreen extends StatelessWidget {
   DepartmentsScreen({super.key});
@@ -60,7 +61,14 @@ class DepartmentsScreen extends StatelessWidget {
               icon: department.icon,
               color: department.color,
               onTap: () {
-                
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => YearsScreen(
+                      departmentName: department.title,
+                    ),
+                  ),
+                );
               },
             );
           },

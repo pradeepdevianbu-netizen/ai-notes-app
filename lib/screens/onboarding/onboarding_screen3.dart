@@ -25,11 +25,10 @@ class OnboardingScreen3 extends StatelessWidget {
                 child: TextButton(
                   onPressed: () {
                     Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const SignUpScreen(),
-                      ),
-                    );
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SignUpScreen(),
+                        ));
                   },
                   child: const Text("Skip"),
                 ),
@@ -55,7 +54,7 @@ class OnboardingScreen3 extends StatelessWidget {
                     ],
                   ),
                   child: const Icon(
-                   Icons.rocket_launch_rounded,
+                    Icons.rocket_launch_rounded,
                     color: Colors.white,
                     size: 60,
                   ),
@@ -67,7 +66,7 @@ class OnboardingScreen3 extends StatelessWidget {
               /// Title
               Center(
                 child: Text(
-             "  Build Your Network",
+                  "  Build Your Network",
                   textAlign: TextAlign.center,
                   style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
@@ -136,4 +135,3 @@ class OnboardingScreen3 extends StatelessWidget {
     );
   }
 }
-
