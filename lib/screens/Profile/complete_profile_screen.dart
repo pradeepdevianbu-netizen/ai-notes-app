@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/screens/home/home_screen.dart';
@@ -16,7 +17,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   String? selectedCollegeId;
   String? selectedCollegeName;
-
   String? selectedDepartment;
   String? selectedYear;
   String? selectedSection;
@@ -48,14 +48,20 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     final snapshot =
         await FirebaseFirestore.instance.collection('colleges').get();
 
+    print("Documents found: ${snapshot.docs.length}");
+
+    for (var doc in snapshot.docs) {
+      print(doc.data());
+    }
     setState(() {
       colleges = snapshot.docs.map((doc) {
         return {
           "id": doc.id,
-          "name": doc["name"],
+          "name": doc["collegeName"],
         };
       }).toList();
     });
+    print(colleges);
   }
 
   Future<void> fetchDepartments(String collegeId) async {
@@ -65,7 +71,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         .get();
 
     setState(() {
-      departments = snapshot.docs.map((doc) => doc["name"].toString()).toList();
+      departments =
+          snapshot.docs.map((doc) => doc["departmentName"].toString()).toList();
 
       selectedDepartment = null;
     });
@@ -216,6 +223,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
                 /// College Dropdown
                 DropdownButtonFormField<String>(
+                  isExpanded: true,
                   value: selectedCollegeId,
                   decoration: InputDecoration(
                     labelText: "College",
@@ -246,26 +254,26 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 const SizedBox(height: 20),
 
                 /// Department Dropdown
-                DropdownButtonFormField<String>(
-                  value: selectedDepartment,
-                  decoration: InputDecoration(
-                    labelText: "Department",
-                    prefixIcon: const Icon(Icons.account_tree_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
+                DropdownSearch<String>(
+                  items: (filter, infiniteScrollProps) => departments,
+                  popupProps: PopupProps.menu(
+                    showSearchBox: true,
+                  ),
+                  decoratorProps: DropDownDecoratorProps(
+                    decoration: InputDecoration(
+                      labelText: "Department",
+                      prefixIcon: Icon(Icons.account_tree_outlined),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                     ),
                   ),
-                  items: departments.map((department) {
-                    return DropdownMenuItem<String>(
-                      value: department,
-                      child: Text(department),
-                    );
-                  }).toList(),
                   onChanged: (value) {
                     setState(() {
                       selectedDepartment = value;
                     });
                   },
+                  selectedItem: selectedDepartment,
                 ),
 
                 const SizedBox(height: 20),
