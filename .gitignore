@@ -47,3 +47,4 @@ tools/*.json
 firebase_upload/serviceAccountKey.json.json
 firebase_upload/*.json
 serviceAccountKey.json
+firebase_upload/
