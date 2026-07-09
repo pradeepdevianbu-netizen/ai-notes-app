@@ -16,10 +16,10 @@ colleges = pd.read_csv("Engineering_colleges_master - collages.csv")
 for _, row in colleges.iterrows():
     db.collection("colleges").document(row["collegeId"]).set({
         "collegeName": row["collegeName"],
-        "district": row["District"],
-        "university": row["University"],
-        "collegeType": row["CollegeType"],
-        "status": row["Status"],
+        "district": row["district"],
+        "university": row["university"],
+        "collegeType": row["collegeType"],
+        "status": row["status"],
     })
 
 print("✅ Colleges Uploaded")
@@ -33,7 +33,7 @@ for _, row in departments.iterrows():
     db.collection("departments").add({
         "collegeId": row["collegeId"],
         "departmentName": row["departmentName"],
-        "duration": int(row["duration"]),
+      #"duration": int(row["duration"]),
     })
 
 print("✅ Departments Uploaded")

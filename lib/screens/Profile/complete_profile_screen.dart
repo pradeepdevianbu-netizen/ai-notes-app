@@ -222,32 +222,48 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 const SizedBox(height: 20),
 
                 /// College Dropdown
-                DropdownButtonFormField<String>(
-                  isExpanded: true,
-                  value: selectedCollegeId,
-                  decoration: InputDecoration(
-                    labelText: "College",
-                    prefixIcon: const Icon(Icons.school_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
+
+                DropdownSearch<Map<String, dynamic>>(
+                  items: (filter, loadProps) async {
+                    if (filter.isEmpty) return colleges;
+
+                    return colleges.where((college) {
+                      return college["name"]
+                          .toString()
+                          .toLowerCase()
+                          .contains(filter.toLowerCase());
+                    }).toList();
+                  },
+                  itemAsString: (item) => item["name"],
+                  compareFn: (a, b) => a["id"] == b["id"],
+                  decoratorProps: DropDownDecoratorProps(
+                    decoration: InputDecoration(
+                      labelText: "College",
+                      prefixIcon: const Icon(Icons.school_outlined),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                     ),
                   ),
-                  items: colleges.map((college) {
-                    return DropdownMenuItem<String>(
-                      value: college["id"],
-                      child: Text(college["name"]),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedCollegeId = value;
+                  popupProps: const PopupProps.menu(
+                    showSearchBox: true,
+                    searchFieldProps: TextFieldProps(
+                      decoration: InputDecoration(
+                        hintText: "Search your college...",
+                        prefixIcon: Icon(Icons.search),
+                      ),
+                    ),
+                  ),
+                  onChanged: (college) {
+                    if (college == null) return;
 
-                      selectedCollegeName = colleges.firstWhere(
-                        (college) => college["id"] == value,
-                      )["name"];
+                    setState(() {
+                      selectedCollegeId = college["id"];
+                      selectedCollegeName = college["name"];
+                      selectedDepartment = null;
                     });
 
-                    fetchDepartments(value!);
+                    fetchDepartments(selectedCollegeId!);
                   },
                 ),
 
