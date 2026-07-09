@@ -136,7 +136,7 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
                   ),
                 )
               : Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(14),
                   child: GridView.builder(
                     itemCount: departments.length,
                     gridDelegate:
@@ -144,7 +144,7 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
                       crossAxisCount: 2,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
-                      childAspectRatio: .95,
+                      childAspectRatio:0.82,
                     ),
                     itemBuilder: (context, index) {
                       final department = departments[index];

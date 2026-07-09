@@ -1,8 +1,9 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:first_app/screens/home/main%20screen/main_screen.dart';
 import 'package:first_app/screens/onboarding/onboarding_screen1.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/constants/app_colors.dart';
-
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,13 +17,24 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    Timer(const Duration(seconds:3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const OnboardingScreen(),
-        ),
-      );
+    Timer(const Duration(seconds: 3), () {
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const MainScreen(),
+          ),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const OnboardingScreen(),
+          ),
+        );
+      }
     });
   }
 
@@ -46,7 +58,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       borderRadius: BorderRadius.circular(28),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withValues(alpha:0.25),
+                          color: AppColors.primary.withValues(alpha: 0.25),
                           blurRadius: 20,
                           offset: const Offset(0, 10),
                         ),

@@ -43,15 +43,9 @@ class _LoginScreenState extends State<LoginScreen> {
         context,
         MaterialPageRoute(
           builder: (_) =>
-              const CompleteProfileScreen (), // Change this to your next screen
+              const CompleteProfileScreen(), // Change this to your next screen
         ),
       );
-
-      // Navigate to Home Screen
-      // Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(builder: (_) => const HomeScreen()),
-      // );
     } on FirebaseAuthException catch (e) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
