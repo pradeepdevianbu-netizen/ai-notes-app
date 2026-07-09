@@ -7,7 +7,7 @@ class Departmentgridcolor extends StatelessWidget {
   final Color color;
   final VoidCallback onTap;
 
-   const Departmentgridcolor({
+  const Departmentgridcolor({
     super.key,
     required this.title,
     required this.icon,
@@ -68,13 +68,18 @@ class Departmentgridcolor extends StatelessWidget {
                         height: 55,
                         width: 55,
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.15),
+                          color: Colors.white.withOpacity(0.18),
                           borderRadius: BorderRadius.circular(18),
                         ),
-                        child: Icon(
-                          icon,
-                          color: Colors.white,
-                          size: 30,
+                        child: Center(
+                          child: Text(
+                            title.substring(0, 1).toUpperCase(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
                       const Spacer(),

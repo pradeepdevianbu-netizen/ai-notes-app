@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:first_app/screens/home/main%20screen/main_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:first_app/screens/home/home_screen.dart';
+
 
 class CompleteProfileScreen extends StatefulWidget {
   const CompleteProfileScreen({super.key});
@@ -388,7 +389,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const HomeScreen(),
+                            builder: (_) => const MainScreen(),
                           ),
                         );
                       }

@@ -23,7 +23,7 @@ class HomeScreen extends StatelessWidget {
             children: [
               /// App Bar
               HomeAppBar(
-                username: username,
+                username: "Pradeep",
                 onNotificationTap: () {
                   // TODO: Open Notification Screen
                 },
