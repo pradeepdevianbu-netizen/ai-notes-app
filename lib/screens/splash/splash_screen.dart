@@ -77,16 +77,17 @@ class _SplashScreenState extends State<SplashScreen> {
                     "CampusX",
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
+                          color: AppColors.textSecondary,
                         ),
                   ),
 
                   const SizedBox(height: 8),
 
                   Text(
-                    "Connect. Collaborate. Grow.",
+                    "Your Campus. Your Community.",
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w500,
                         ),
                   ),
                 ],
