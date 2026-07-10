@@ -1,7 +1,8 @@
-import 'package:first_app/screens/home/department/year_card.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:first_app/screens/home/department/year_preview_card.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/screens/home/department/students_screen.dart';
-import 'students_screen.dart';
+
 class YearsScreen extends StatelessWidget {
   final String departmentName;
 
@@ -31,42 +32,50 @@ class YearsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xffF7F8FC),
+
       appBar: AppBar(
         title: Text(departmentName),
-        centerTitle: true,
       ),
-      body: Padding(
+
+      body: ListView.builder(
         padding: const EdgeInsets.all(16),
-        child: GridView.builder(
-          itemCount: years.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: .82,
-          ),
-          itemBuilder: (context, index) {
-            return YearCard(
+        itemCount: years.length,
+        itemBuilder: (context, index) {
+          return FutureBuilder<QuerySnapshot>(
+            future: FirebaseFirestore.instance
+                .collection("users")
+                .where("department", isEqualTo: departmentName)
+                .where("year", isEqualTo: years[index])
+                .get(),
+            builder: (context, snapshot) {
+
+              int studentCount = 0;
+
+              if (snapshot.hasData) {
+                studentCount = snapshot.data!.docs.length;
+              }
+
+              return YearPreviewCard(
                 title: years[index],
+                studentCount: studentCount,
                 color: getColor(index),
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) =>  StudentsScreen(
+                      builder: (_) => StudentsScreen(
                         departmentName: departmentName,
-                        year: years[index], 
+                        year: years[index],
                       ),
                     ),
                   );
-                });
-            // StudentsScreen()
-          },
-        ),
+                },
+              );
+            },
+          );
+        },
       ),
     );
   }
 }
-
-
-
