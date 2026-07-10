@@ -1,10 +1,8 @@
-
 import 'package:first_app/screens/home/department/department_screen.dart';
 import 'package:flutter/material.dart';
 
 class Departmentcard extends StatelessWidget {
   const Departmentcard({super.key});
-
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +14,7 @@ class Departmentcard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) =>  DepartmentsScreen(),
+              builder: (_) => DepartmentsScreen(),
             ),
           );
         },
@@ -56,9 +54,7 @@ class Departmentcard extends StatelessWidget {
                     size: 34,
                   ),
                 ),
-
                 const SizedBox(width: 18),
-
                 const Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,7 +79,6 @@ class Departmentcard extends StatelessWidget {
                     ],
                   ),
                 ),
-
                 Container(
                   height: 45,
                   width: 45,
@@ -105,4 +100,3 @@ class Departmentcard extends StatelessWidget {
     );
   }
 }
-

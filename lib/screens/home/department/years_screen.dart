@@ -1,7 +1,7 @@
+import 'package:first_app/screens/home/department/year_card.dart';
 import 'package:flutter/material.dart';
-import 'package:first_app/models/year.dart';
-import 'package:first_app/screens/home/widgets/year_card.dart';
-
+import 'package:first_app/screens/home/department/students_screen.dart';
+import 'students_screen.dart';
 class YearsScreen extends StatelessWidget {
   final String departmentName;
 
@@ -10,80 +10,63 @@ class YearsScreen extends StatelessWidget {
     required this.departmentName,
   });
 
-  final List<YearModel> years = const [
-    YearModel(
-      title: "First Year",
-      subtitle: "Explore first year students",
-      icon: Icons.looks_one_rounded,
-      color: Color(0xFF4F8CFF),
-    ),
-    YearModel(
-      title: "Second Year",
-      subtitle: "Explore second year students",
-      icon: Icons.looks_two_rounded,
-      color: Color(0xFF00C2A8),
-    ),
-    YearModel(
-      title: "Third Year",
-      subtitle: "Explore third year students",
-      icon: Icons.looks_3_rounded,
-      color: Color(0xFFFF8A00),
-    ),
-    YearModel(
-      title: "Final Year",
-      subtitle: "Explore final year students",
-      icon: Icons.workspace_premium_rounded,
-      color: Color(0xFF8B5CF6),
-    ),
+  final List<String> years = const [
+    "1st Year",
+    "2nd Year",
+    "3rd Year",
+    "4th Year",
   ];
+
+  Color getColor(int index) {
+    final colors = [
+      const Color(0xFF5B8CFF),
+      const Color(0xFF36CFC9),
+      const Color(0xFF52C41A),
+      const Color(0xFFFFA940),
+    ];
+
+    return colors[index];
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F8FC),
       appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.black,
-        title: Text(
-          departmentName,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: Text(departmentName),
+        centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: ListView(
-          children: [
-            const Text(
-              "Select Year",
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              "Choose your academic year",
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 28),
-            ...years.map(
-              (year) => YearCard(
-                title: year.title,
-                subtitle: year.subtitle,
-                icon: year.icon,
-                color: year.color,
+        padding: const EdgeInsets.all(16),
+        child: GridView.builder(
+          itemCount: years.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: .82,
+          ),
+          itemBuilder: (context, index) {
+            return YearCard(
+                title: years[index],
+                color: getColor(index),
                 onTap: () {
-                  // Navigate to SectionsScreen
-                },
-              ),
-            ),
-          ],
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>  StudentsScreen(
+                        departmentName: departmentName,
+                        year: years[index], 
+                      ),
+                    ),
+                  );
+                });
+            // StudentsScreen()
+          },
         ),
       ),
     );
   }
 }
+
+
+

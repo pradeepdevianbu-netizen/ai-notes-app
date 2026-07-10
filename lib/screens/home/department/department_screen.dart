@@ -1,63 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:first_app/screens/home/department/department_gridcolor.dart';
+import 'package:first_app/screens/home/department/department_preview_card.dart';
 import 'package:first_app/screens/home/department/years_screen.dart';
+import 'package:flutter/material.dart';
 
-class DepartmentsScreen extends StatefulWidget {
+class DepartmentsScreen extends StatelessWidget {
   const DepartmentsScreen({super.key});
-
-  @override
-  State<DepartmentsScreen> createState() => _DepartmentsScreenState();
-}
-
-class _DepartmentsScreenState extends State<DepartmentsScreen> {
-  List<Map<String, dynamic>> departments = [];
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchDepartments();
-  }
-
-  Future<void> fetchDepartments() async {
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-
-      if (user == null) return;
-
-      // Fetch logged-in user's profile
-      final userDoc = await FirebaseFirestore.instance
-          .collection("users")
-          .doc(user.uid)
-          .get();
-
-      final String collegeId = userDoc["collegeId"];
-
-      // Fetch only that college's departments
-      final snapshot = await FirebaseFirestore.instance
-          .collection("departments")
-          .where("collegeId", isEqualTo: collegeId)
-          .get();
-
-      departments = snapshot.docs.map((doc) {
-        return {
-          "departmentName": doc["departmentName"],
-        };
-      }).toList();
-
-      setState(() {
-        isLoading = false;
-      });
-    } catch (e) {
-      debugPrint(e.toString());
-
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
 
   Color getColor(int index) {
     final colors = [
@@ -65,12 +12,10 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
       const Color(0xFF36CFC9),
       const Color(0xFF52C41A),
       const Color(0xFFFFA940),
-      const Color(0xFFFADB14),
-      const Color(0xFFB37FEB),
-      const Color(0xFFFF6B6B),
-      const Color(0xFF00C2A8),
-      const Color(0xFF845EC2),
-      const Color(0xFFFF8066),
+      const Color(0xFFF759AB),
+      const Color(0xFF722ED1),
+      const Color(0xFF13C2C2),
+      const Color(0xFFFA8C16),
     ];
 
     return colors[index % colors.length];
@@ -100,6 +45,7 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
         return Icons.precision_manufacturing_rounded;
 
       case "civil engineering":
+      case "civil":
         return Icons.architecture_rounded;
 
       case "biomedical engineering":
@@ -113,60 +59,129 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
         return Icons.flight_rounded;
 
       default:
-        return Icons.grid_view_rounded;
+        return Icons.school_rounded;
+    }
+  }
+
+  String getDepartmentSubtitle(String department) {
+    switch (department.toLowerCase()) {
+      case "ai & ds":
+        return "Artificial Intelligence & Data Science";
+
+      case "cse":
+      case "computer science and engineering":
+        return "Computer Science & Engineering";
+
+      case "it":
+      case "information technology":
+        return "Information Technology";
+
+      case "ece":
+        return "Electronics & Communication Engineering";
+
+      case "eee":
+        return "Electrical & Electronics Engineering";
+
+      case "mech":
+      case "mechanical engineering":
+        return "Mechanical Engineering";
+
+      case "civil":
+      case "civil engineering":
+        return "Civil Engineering";
+
+      case "bme":
+      case "biomedical engineering":
+        return "Biomedical Engineering";
+
+      default:
+        return department;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Departments"),
-        centerTitle: true,
-      ),
-      body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : departments.isEmpty
-              ? const Center(
-                  child: Text(
-                    "No Departments Found",
-                    style: TextStyle(fontSize: 18),
-                  ),
-                )
-              : Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: GridView.builder(
-                    itemCount: departments.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio:0.82,
-                    ),
-                    itemBuilder: (context, index) {
-                      final department = departments[index];
+      backgroundColor: const Color(0xffF7F8FC),
 
-                      return Departmentgridcolor(
-                        title: department["departmentName"],
-                        icon: getDepartmentIcon(department["departmentName"]),
-                        color: getColor(index),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => YearsScreen(
-                                departmentName: department["departmentName"],
-                              ),
-                            ),
-                          );
-                        },
+      appBar: AppBar(
+        title: const Text(
+          "Departments",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: false,
+      ),
+
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection("departments")
+            .orderBy("departmentName")
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(
+              child: Text("No Departments Found"),
+            );
+          }
+
+          final departments = snapshot.data!.docs;
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: departments.length,
+            itemBuilder: (context, index) {
+              final department =
+                  departments[index].data() as Map<String, dynamic>;
+
+              return FutureBuilder<QuerySnapshot>(
+                future: FirebaseFirestore.instance
+                    .collection("users")
+                    .where(
+                      "department",
+                      isEqualTo: department["departmentName"],
+                    )
+                    .get(),
+                builder: (context, userSnapshot) {
+                  int studentCount = 0;
+
+                  if (userSnapshot.hasData) {
+                    studentCount = userSnapshot.data!.docs.length;
+                  }
+
+                  return DepartmentPreviewCard(
+                    title: department["departmentName"],
+                    subtitle: getDepartmentSubtitle(
+                      department["departmentName"],
+                    ),
+                    studentCount: studentCount,
+                    color: getColor(index),
+                    icon: getDepartmentIcon(
+                      department["departmentName"],
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => YearsScreen(
+                            departmentName:
+                                department["departmentName"],
+                          ),
+                        ),
                       );
                     },
-                  ),
-                ),
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
