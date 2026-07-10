@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first_app/screens/home/department/department_preview_card.dart';
 import 'package:first_app/screens/home/department/years_screen.dart';
+import 'package:first_app/screens/home/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 
 class DepartmentsScreen extends StatelessWidget {
@@ -62,24 +63,14 @@ class DepartmentsScreen extends StatelessWidget {
     final uid = FirebaseAuth.instance.currentUser!.uid;
 
     return Scaffold(
-      backgroundColor: const Color(0xffF7F8FC),
-
-      appBar: AppBar(
-        elevation: 0,
-        centerTitle: false,
-        title: const Text(
-          "Departments",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      backgroundColor: Color(0xffF7F8FC),
+      appBar: const CustomAppBar(
+        title: "Departments",
+         subtitle: "Browse your college departments",
+          
       ),
-
       body: FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance
-            .collection("users")
-            .doc(uid)
-            .get(),
+        future: FirebaseFirestore.instance.collection("users").doc(uid).get(),
         builder: (context, userSnapshot) {
           if (!userSnapshot.hasData) {
             return const Center(
@@ -87,8 +78,7 @@ class DepartmentsScreen extends StatelessWidget {
             );
           }
 
-          final user =
-              userSnapshot.data!.data() as Map<String, dynamic>;
+          final user = userSnapshot.data!.data() as Map<String, dynamic>;
 
           final collegeId = user["collegeId"];
 
@@ -117,8 +107,7 @@ class DepartmentsScreen extends StatelessWidget {
                 itemCount: departments.length,
                 itemBuilder: (context, index) {
                   final department =
-                      departments[index].data()
-                          as Map<String, dynamic>;
+                      departments[index].data() as Map<String, dynamic>;
 
                   return FutureBuilder<QuerySnapshot>(
                     future: FirebaseFirestore.instance
@@ -129,16 +118,14 @@ class DepartmentsScreen extends StatelessWidget {
                         )
                         .where(
                           "department",
-                          isEqualTo:
-                              department["departmentName"],
+                          isEqualTo: department["departmentName"],
                         )
                         .get(),
                     builder: (context, studentSnapshot) {
                       int count = 0;
 
                       if (studentSnapshot.hasData) {
-                        count =
-                            studentSnapshot.data!.docs.length;
+                        count = studentSnapshot.data!.docs.length;
                       }
 
                       return DepartmentPreviewCard(
@@ -153,8 +140,7 @@ class DepartmentsScreen extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (_) => YearsScreen(
-                                departmentName:
-                                    department["departmentName"],
+                                departmentName: department["departmentName"],
                               ),
                             ),
                           );

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:first_app/screens/home/department/year_preview_card.dart';
+import 'package:first_app/screens/home/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/screens/home/department/students_screen.dart';
 
@@ -34,8 +35,9 @@ class YearsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xffF7F8FC),
 
-      appBar: AppBar(
-        title: Text(departmentName),
+      appBar: CustomAppBar(
+        title: (departmentName),
+        subtitle: "4 years Available",
       ),
 
       body: ListView.builder(
