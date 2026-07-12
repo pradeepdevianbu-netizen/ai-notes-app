@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:first_app/screens/connection/service/connection_service.dart';
 import 'package:flutter/material.dart';
 
 class ConnectionRequestsScreen extends StatelessWidget {
@@ -7,6 +8,7 @@ class ConnectionRequestsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final connectionService = ConnectionService();
     return Scaffold(
       appBar: AppBar(
         title: const Text("Connection Requests"),
@@ -91,15 +93,32 @@ class ConnectionRequestsScreen extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           ElevatedButton(
-                            onPressed: () {
-                              // Accept
+                            onPressed: () async {
+                              await connectionService.acceptRequest(
+                                requests[index].id,
+                                senderId,
+                              );
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Connection Accepted"),
+                                ),
+                              );
                             },
                             child: const Text("Accept"),
                           ),
                           const SizedBox(width: 8),
                           OutlinedButton(
-                            onPressed: () {
-                              // Reject
+                            onPressed: () async {
+                              await connectionService.rejectRequest(
+                                requests[index].id,
+                              );
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Connection Rejected"),
+                                ),
+                              );
                             },
                             child: const Text("Reject"),
                           ),

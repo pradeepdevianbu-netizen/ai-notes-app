@@ -28,7 +28,7 @@ class HomeScreen extends StatelessWidget {
         final user = snapshot.data!.data() as Map<String, dynamic>;
 
         return Scaffold(
-          backgroundColor: const Color(0xffF7F8FC),
+          backgroundColor: const Color.fromARGB(255, 231, 232, 234),
           body: SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(vertical: 16),
