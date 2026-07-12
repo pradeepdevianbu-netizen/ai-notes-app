@@ -1,3 +1,4 @@
+import 'package:first_app/screens/connection/service/connection_service.dart';
 import 'package:flutter/material.dart';
 
 class StudentCard extends StatelessWidget {
@@ -46,7 +47,6 @@ class StudentCard extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   Positioned(
                     right: 2,
                     bottom: 2,
@@ -65,9 +65,7 @@ class StudentCard extends StatelessWidget {
                   ),
                 ],
               ),
-
               const SizedBox(width: 14),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,9 +77,7 @@ class StudentCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-
                     const SizedBox(height: 4),
-
                     Text(
                       "${student["department"]} • ${student["year"]}",
                       style: TextStyle(
@@ -89,9 +85,7 @@ class StudentCard extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-
                     const SizedBox(height: 2),
-
                     Text(
                       "Section ${student["section"]}",
                       style: TextStyle(
@@ -101,7 +95,6 @@ class StudentCard extends StatelessWidget {
                   ],
                 ),
               ),
-
               IconButton(
                 onPressed: () {},
                 icon: const Icon(Icons.more_vert),
@@ -127,51 +120,85 @@ class StudentCard extends StatelessWidget {
 
           Row(
             children: [
-              Icon(
-                Icons.people_alt_rounded,
-                color: Colors.grey.shade600,
-                size: 18,
-              ),
-              const SizedBox(width: 5),
-              Text(
-                "0 Connections",
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                ),
-              ),
-              const Spacer(),
-              const Icon(
-                Icons.verified,
-                color: Colors.blue,
-                size: 18,
-              ),
-              const SizedBox(width: 5),
-              const Text("Verified"),
-            ],
-          ),
-
-          const SizedBox(height: 18),
-
-          Row(
-            children: [
               Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: onConnect,
-                  icon: const Icon(Icons.person_add_alt_1),
-                  label: const Text("Connect"),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(46),
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
+                child: StreamBuilder<String>(
+                  stream: ConnectionService()
+                      .getConnectionStatusStream(student["uid"]),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+
+                    final status = snapshot.data!;
+
+                    //
+
+                    if (status == "connect") {
+                      return ElevatedButton.icon(
+                        onPressed: onConnect,
+                        icon: const Icon(Icons.person_add_alt_1),
+                        label: const Text("Connect"),
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(46),
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                      );
+                    }
+                    if (status == "requested") {
+                      return ElevatedButton.icon(
+                        onPressed: () async {
+                          await ConnectionService()
+                              .cancelRequest(student["uid"]);
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Request Cancelled"),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.close),
+                        label: const Text("Requested"),
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(46),
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                      );
+                    }
+
+                    if (status == "connected") {
+                      return ElevatedButton.icon(
+                        onPressed: null,
+                        icon: const Icon(Icons.check_circle),
+                        label: const Text("Connected"),
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(46),
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                      );
+                    }
+
+                    return ElevatedButton(
+                      onPressed: null,
+                      child: const Text("Loading"),
+                    );
+                  },
                 ),
               ),
-
               const SizedBox(width: 12),
-
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: onView,
