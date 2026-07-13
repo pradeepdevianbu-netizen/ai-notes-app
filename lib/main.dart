@@ -1,3 +1,4 @@
+import 'package:first_app/screens/auth/auth_wrapper.dart';
 import 'package:first_app/screens/auth/login_screen.dart';
 import 'package:first_app/screens/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home:  const LoginScreen(),
+     home: const AuthWrapper(),
     
     );
   }

@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final String? subtitle;
-  final Color backgroundColor;
-  final Color foregroundColor;
   final List<Widget>? actions;
 
   const CustomAppBar({
@@ -12,43 +10,72 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.title,
     this.subtitle,
     this.actions,
-    this.backgroundColor = const Color(0xFF0F172A),
-    this.foregroundColor = Colors.white,
   });
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      toolbarHeight: subtitle == null ? 60 : 80,
-      backgroundColor: backgroundColor,
-      foregroundColor: foregroundColor,
+      automaticallyImplyLeading: true,
+      centerTitle: false,
+      toolbarHeight: subtitle == null ? 68 : 82,
+
+      backgroundColor: const Color(0xFF0F172A),
+      foregroundColor: Colors.white,
+
       elevation: 0,
+      scrolledUnderElevation: 0,
+
+      surfaceTintColor: Colors.transparent,
+
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(1),
+        child: Container(
+          height: 1,
+          color: Colors.white.withOpacity(.08),
+        ),
+      ),
+
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             title,
-            style: TextStyle(
-              color: foregroundColor,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
+            style: const TextStyle(
+              fontSize: 23,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.3,
+              color: Colors.white,
             ),
           ),
-          if (subtitle != null)
+
+          if (subtitle != null) ...[
+            const SizedBox(height: 3),
             Text(
               subtitle!,
               style: TextStyle(
-                color: foregroundColor.withOpacity(0.8),
-                fontSize: 14,
+                fontSize: 13,
+                color: Colors.grey.shade400,
+                fontWeight: FontWeight.w500,
               ),
             ),
+          ],
         ],
       ),
-      actions: actions,
+
+      iconTheme: const IconThemeData(
+        color: Colors.white,
+        size: 24,
+      ),
+
+      actions: [
+        if (actions != null) ...actions!,
+        const SizedBox(width: 10),
+      ],
     );
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(subtitle == null ? 60 : 80);
+  Size get preferredSize =>
+      Size.fromHeight(subtitle == null ? 68 : 82);
 }

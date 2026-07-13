@@ -1,28 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:first_app/screens/connection/service/connection_service.dart';
 import 'package:flutter/material.dart';
+import 'package:first_app/screens/connection/service/connection_service.dart';
 
 class ConnectionRequestsScreen extends StatelessWidget {
   const ConnectionRequestsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final connectionService = ConnectionService();
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final service = ConnectionService();
+
     return Scaffold(
+      backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
+        backgroundColor: const Color(0xFF0F172A),
+        elevation: 0,
         title: const Text("Connection Requests"),
-        centerTitle: true,
       ),
+
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection("connection_requests")
-            .where(
-              "receiverId",
-              isEqualTo: FirebaseAuth.instance.currentUser!.uid,
-            )
+            .where("receiverId", isEqualTo: uid)
             .where("status", isEqualTo: "pending")
             .snapshots(),
+
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -30,24 +33,25 @@ class ConnectionRequestsScreen extends StatelessWidget {
             );
           }
 
-          final requests = snapshot.data?.docs ?? [];
-
-          if (requests.isEmpty) {
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(
               child: Text(
-                "No Connection Requests",
+                "No Pending Requests",
                 style: TextStyle(
+                  color: Colors.white,
                   fontSize: 18,
-                  fontWeight: FontWeight.w500,
                 ),
               ),
             );
           }
 
+          final requests = snapshot.data!.docs;
+
           return ListView.builder(
+            padding: const EdgeInsets.all(16),
             itemCount: requests.length,
             itemBuilder: (context, index) {
-              final request = requests[index].data() as Map<String, dynamic>;
+              final request = requests[index];
 
               final senderId = request["senderId"];
 
@@ -56,6 +60,7 @@ class ConnectionRequestsScreen extends StatelessWidget {
                     .collection("users")
                     .doc(senderId)
                     .get(),
+
                 builder: (context, userSnapshot) {
                   if (!userSnapshot.hasData) {
                     return const SizedBox();
@@ -64,66 +69,91 @@ class ConnectionRequestsScreen extends StatelessWidget {
                   final sender =
                       userSnapshot.data!.data() as Map<String, dynamic>;
 
-                  return Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 18),
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E293B),
+                      borderRadius: BorderRadius.circular(22),
                     ),
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        radius: 28,
-                        child: Text(
-                          (sender["name"] ?? "A")[0].toUpperCase(),
-                        ),
-                      ),
-                      title: Text(
-                        sender["name"] ?? "",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      subtitle: Text(
-                        "${sender["department"]} • ${sender["year"]}",
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () async {
-                              await connectionService.acceptRequest(
-                                requests[index].id,
-                                senderId,
-                              );
 
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("Connection Accepted"),
-                                ),
-                              );
-                            },
-                            child: const Text("Accept"),
-                          ),
-                          const SizedBox(width: 8),
-                          OutlinedButton(
-                            onPressed: () async {
-                              await connectionService.rejectRequest(
-                                requests[index].id,
-                              );
+                    child: Column(
+                      children: [
 
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("Connection Rejected"),
-                                ),
-                              );
-                            },
-                            child: const Text("Reject"),
+                        CircleAvatar(
+                          radius: 35,
+                          child: Text(
+                            sender["name"][0].toUpperCase(),
+                            style: const TextStyle(fontSize: 25),
                           ),
-                        ],
-                      ),
+                        ),
+
+                        const SizedBox(height: 15),
+
+                        Text(
+                          sender["name"],
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        const SizedBox(height: 5),
+
+                        Text(
+                          "${sender["department"]} • ${sender["year"]}",
+                          style: const TextStyle(
+                            color: Colors.white70,
+                          ),
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        const Text(
+                          "Wants to connect with you",
+                          style: TextStyle(
+                            color: Colors.white54,
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        Row(
+                          children: [
+
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () async {
+
+                                  await service.rejectRequest(
+                                    request.id,
+                                  );
+
+                                },
+                                child: const Text("Reject"),
+                              ),
+                            ),
+
+                            const SizedBox(width: 12),
+
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () async {
+
+                                  await service.acceptRequest(
+                                    request.id,
+                                    senderId,
+                                  );
+
+                                },
+                                child: const Text("Accept"),
+                              ),
+                            ),
+
+                          ],
+                        )
+                      ],
                     ),
                   );
                 },

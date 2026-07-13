@@ -12,9 +12,9 @@ class HomeSearchBar extends StatelessWidget {
       child: TextField(
         decoration: InputDecoration(
           hintText: "Search seniors, classmates...",
-          prefixIcon: Icon(
+          prefixIcon: const Icon(
             Icons.search,
-            color: colors.primary,
+            color: Color(0xFF1E293B),
           ),
           filled: true,
           fillColor: colors.surface,
@@ -24,8 +24,8 @@ class HomeSearchBar extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(
-              color: colors.primary,
+            borderSide: const BorderSide(
+              color: Color.fromARGB(255, 116, 131, 153),
               width: 1.5,
             ),
           ),

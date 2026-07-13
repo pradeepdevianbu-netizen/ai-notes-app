@@ -143,52 +143,44 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: pages[selectedIndex],
-      bottomNavigationBar: SafeArea(
-        child: Container(
-          margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          padding: const EdgeInsets.symmetric(
-            horizontal: 8,
-            vertical: 10,
+      bottomNavigationBar: Container(
+        height: 80,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: const BoxDecoration(
+          color: Color(0xFF111827),
+          border: Border(
+            top: BorderSide(
+              color: Colors.white12,
+            ),
           ),
-          decoration: BoxDecoration(
-            color: const Color(0xFF0F172A),
-            borderRadius: BorderRadius.circular(28),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF5B8CFF).withOpacity(.25),
-                blurRadius: 30,
-                offset: const Offset(0, 12),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _navItem(
-                index: 0,
-                icon: Icons.home_rounded,
-                label: "Home",
-              ),
-              _navItem(
-                index: 1,
-                icon: Icons.people_alt_rounded,
-                label: "Connect",
-              ),
-              _badgeNavItem(
-                index: 2,
-                icon: Icons.chat_bubble_rounded,
-                badge: 3,
-                label: "Messages",
-              ),
-              _badgeNavItem(
-                index: 3,
-                icon: Icons.notifications_rounded,
-                badge: 8,
-                label: "Alerts",
-              ),
-              _profileNavItem(index: 4),
-            ],
-          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _navItem(
+              index: 0,
+              icon: Icons.home_rounded,
+              label: "Home",
+            ),
+            _navItem(
+              index: 1,
+              icon: Icons.people_alt_rounded,
+              label: "Connect",
+            ),
+            _badgeNavItem(
+              index: 2,
+              icon: Icons.chat_bubble_rounded,
+              badge: 3,
+              label: "Messages",
+            ),
+            _badgeNavItem(
+              index: 3,
+              icon: Icons.notifications_rounded,
+              badge: 8,
+              label: "Alerts",
+            ),
+            _profileNavItem(index: 4),
+          ],
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first_app/screens/connection/service/connection_service.dart';
 import 'package:first_app/screens/home/department/student_profile_screen.dart';
 import 'package:first_app/screens/home/widgets/custom_app_bar.dart';
@@ -33,7 +34,12 @@ class StudentsScreen extends StatelessWidget {
           );
         }
 
-        final students = snapshot.data?.docs ?? [];
+        final currentUser = FirebaseAuth.instance.currentUser;
+
+        final students = (snapshot.data?.docs ?? []).where((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          return data["uid"] != currentUser?.uid;
+        }).toList();
 
         if (students.isEmpty) {
           return Scaffold(

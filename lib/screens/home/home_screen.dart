@@ -14,45 +14,42 @@ class HomeScreen extends StatelessWidget {
     final uid = FirebaseAuth.instance.currentUser!.uid;
 
     return FutureBuilder<DocumentSnapshot>(
-      future: FirebaseFirestore.instance.collection("users").doc(uid).get(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
+        future: FirebaseFirestore.instance.collection("users").doc(uid).get(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Scaffold(
+              backgroundColor: const Color(0xFFF5F7FB),
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+
+          final user = snapshot.data!.data() as Map<String, dynamic>;
+
           return const Scaffold(
-            backgroundColor: const Color(0xFFF5F7FB),
-            body: Center(
-              child: CircularProgressIndicator(),
+            backgroundColor: Color(0xFFF5F7FB),
+            appBar: CustomAppBar(
+              title: "CampusX",
+              subtitle: "Connect • Chat • Grow",
             ),
-          );
-        }
-
-        final user = snapshot.data!.data() as Map<String, dynamic>;
-
-        return Scaffold(
-          backgroundColor: const Color.fromARGB(255, 231, 232, 234),
-          body: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  HomeAppBar(
-                    username: user["name"] ?? "",
-                    collegeName: user["collegeName"] ?? "",
-                    onNotificationTap: () {},
-                    onProfileTap: () {},
-                  ),
-                  const SizedBox(height: 24),
-                  const HomeSearchBar(),
-                  const SizedBox(height: 30),
-                  const AIAssistantCard(),
-                  const SizedBox(height: 24),
-                  const Departmentcard(),
-                ],
+            body: SafeArea(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 10),
+                    HomeSearchBar(),
+                    SizedBox(height: 24),
+                    AIAssistantCard(),
+                    SizedBox(height: 24),
+                    Departmentcard(),
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      },
-    );
+          );
+        });
   }
 }
