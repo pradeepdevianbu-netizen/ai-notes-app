@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first_app/screens/connection/connection_request_screen.dart';
 import 'package:flutter/material.dart';
+import 'widgets/my_connections_section.dart';
 
 class ConnectionScreen extends StatelessWidget {
   const ConnectionScreen({super.key});
@@ -78,6 +79,7 @@ class ConnectionScreen extends StatelessWidget {
           ),
 
           const SizedBox(height: 18),
+          const MyConnectionsSection(),
 
           /// Suggested Students
           _buildCard(

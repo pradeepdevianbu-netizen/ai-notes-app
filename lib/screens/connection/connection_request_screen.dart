@@ -11,6 +11,8 @@ class ConnectionRequestsScreen extends StatelessWidget {
     final uid = FirebaseAuth.instance.currentUser!.uid;
     final service = ConnectionService();
 
+   
+
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
