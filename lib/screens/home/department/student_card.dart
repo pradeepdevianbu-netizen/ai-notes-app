@@ -1,7 +1,7 @@
 import 'package:first_app/screens/connection/service/connection_service.dart';
 import 'package:flutter/material.dart';
 
-class StudentCard extends StatelessWidget {
+class StudentCard extends StatefulWidget {
   final Map<String, dynamic> student;
   final VoidCallback onConnect;
   final VoidCallback onView;
@@ -12,6 +12,31 @@ class StudentCard extends StatelessWidget {
     required this.onConnect,
     required this.onView,
   });
+
+  @override
+  State<StudentCard> createState() => _StudentCardState();
+}
+
+// ignore: non_constant_identifier_names
+class _StudentCardState extends State<StudentCard> {
+  bool isRequested = false;
+
+  @override
+  void initState() {
+    super.initState();
+    loadRequestStatus();
+  }
+
+  void loadRequestStatus() async {
+    final result =
+        await ConnectionService().checkRequest(widget.student["uid"]);
+
+    if (mounted) {
+      setState(() {
+        isRequested = result;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,13 +64,6 @@ class StudentCard extends StatelessWidget {
                   CircleAvatar(
                     radius: 32,
                     backgroundColor: Colors.blue.shade100,
-                    child: Text(
-                      (student["name"] ?? "A")[0].toUpperCase(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24,
-                      ),
-                    ),
                   ),
                   Positioned(
                     right: 2,
@@ -71,7 +89,7 @@ class StudentCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      student["name"] ?? "",
+                      widget.student["name"] ?? "",
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -79,7 +97,7 @@ class StudentCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "${student["department"]} • ${student["year"]}",
+                      "${widget.student["department"]} • ${widget.student["year"]}",
                       style: TextStyle(
                         color: Colors.grey.shade700,
                         fontWeight: FontWeight.w500,
@@ -87,7 +105,7 @@ class StudentCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      "Section ${student["section"]}",
+                      "Section ${widget.student["section"]}",
                       style: TextStyle(
                         color: Colors.grey.shade600,
                       ),
@@ -95,10 +113,77 @@ class StudentCard extends StatelessWidget {
                   ],
                 ),
               ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.more_vert),
-              ),
+              StreamBuilder<String>(
+                  stream: ConnectionService()
+                      .getConnectionStatusStream(widget.student["uid"]),
+                  builder: (context, snapshot) {
+                    final status = snapshot.data ?? "connect";
+
+                    if (status != "connected") {
+                      return const SizedBox.shrink();
+                    }
+                    return PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert),
+                      onSelected: (value) async {
+                        if (value == "disconnect") {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text("Disconnect"),
+                              content: Text(
+                                "Disconnect from ${widget.student["name"]}?",
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, false);
+                                  },
+                                  child: const Text("Cancel"),
+                                ),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    foregroundColor: Colors.white,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context, true);
+                                  },
+                                  child: const Text("Disconnect"),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          if (confirm == true) {
+                            await ConnectionService()
+                                .disconnect(widget.student["uid"]);
+
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Disconnected from ${widget.student["name"]}",
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+                        }
+                      },
+                      itemBuilder: (context) => const [
+                        PopupMenuItem<String>(
+                          value: "disconnect",
+                          child: Row(
+                            children: [
+                              Icon(Icons.person_remove, color: Colors.red),
+                              SizedBox(width: 8),
+                              Text("Disconnect"),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
             ],
           ),
 
@@ -107,7 +192,7 @@ class StudentCard extends StatelessWidget {
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              student["about"] ?? "No bio available",
+              widget.student["about"] ?? "No bio available",
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -123,7 +208,7 @@ class StudentCard extends StatelessWidget {
               Expanded(
                 child: StreamBuilder<String>(
                   stream: ConnectionService()
-                      .getConnectionStatusStream(student["uid"]),
+                      .getConnectionStatusStream(widget.student["uid"]),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return const Center(
@@ -137,7 +222,7 @@ class StudentCard extends StatelessWidget {
 
                     if (status == "connect") {
                       return ElevatedButton.icon(
-                        onPressed: onConnect,
+                        onPressed: widget.onConnect,
                         icon: const Icon(Icons.person_add_alt_1),
                         label: const Text("Connect"),
                         style: ElevatedButton.styleFrom(
@@ -154,11 +239,13 @@ class StudentCard extends StatelessWidget {
                       return ElevatedButton.icon(
                         onPressed: () async {
                           await ConnectionService()
-                              .cancelRequest(student["uid"]);
+                              .cancelRequest(widget.student["uid"]);
 
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Request Cancelled"),
+                            SnackBar(
+                              content: Text(
+                                isRequested ? "Requested" : "Connect",
+                              ),
                             ),
                           );
                         },
@@ -181,9 +268,10 @@ class StudentCard extends StatelessWidget {
                         icon: const Icon(Icons.check_circle),
                         label: const Text("Connected"),
                         style: ElevatedButton.styleFrom(
+                          disabledBackgroundColor:
+                              const Color(0xFF22C55E), // Bright Green
+                          disabledForegroundColor: Colors.white,
                           minimumSize: const Size.fromHeight(46),
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
@@ -191,9 +279,15 @@ class StudentCard extends StatelessWidget {
                       );
                     }
 
-                    return ElevatedButton(
-                      onPressed: null,
-                      child: const Text("Loading"),
+                    return ElevatedButton.icon(
+                      onPressed: widget.onConnect,
+                      icon: const Icon(Icons.person_add_alt_1),
+                      label: const Text("Connect"),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(46),
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                      ),
                     );
                   },
                 ),
@@ -201,7 +295,7 @@ class StudentCard extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: onView,
+                  onPressed: widget.onView,
                   icon: const Icon(Icons.visibility_outlined),
                   label: const Text("Profile"),
                   style: OutlinedButton.styleFrom(

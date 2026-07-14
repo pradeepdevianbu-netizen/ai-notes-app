@@ -5,6 +5,59 @@ class ConnectionService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  Future<bool> checkRequest(String userId) async {
+  final currentUser = _auth.currentUser;
+
+  if (currentUser == null) return false;
+
+  final query = await _firestore
+      .collection("connections")
+      .where("senderId", isEqualTo: userId)
+      .where("receiverId", isEqualTo: currentUser.uid)
+      .get();
+
+  return query.docs.isNotEmpty;
+}
+  
+  Future<void> disconnect(String otherUserId) async {
+    final currentUser = _auth.currentUser;
+
+    if (currentUser == null) return;
+
+    // Delete accepted request
+    final requestSnapshot = await _firestore
+        .collection("connection_requests")
+        .where("status", isEqualTo: "accepted")
+        .get();
+
+    for (final doc in requestSnapshot.docs) {
+      final data = doc.data();
+
+      final senderId = data["senderId"];
+      final receiverId = data["receiverId"];
+
+      if ((senderId == currentUser.uid && receiverId == otherUserId) ||
+          (senderId == otherUserId && receiverId == currentUser.uid)) {
+        await doc.reference.delete();
+      }
+    }
+
+    // Delete connection
+    final connectionSnapshot = await _firestore.collection("connections").get();
+
+    for (final doc in connectionSnapshot.docs) {
+      final data = doc.data();
+
+      final user1 = data["user1"];
+      final user2 = data["user2"];
+
+      if ((user1 == currentUser.uid && user2 == otherUserId) ||
+          (user1 == otherUserId && user2 == currentUser.uid)) {
+        await doc.reference.delete();
+      }
+    }
+  }
+
   Future<bool> sendConnectionRequest(String receiverId) async {
     try {
       final currentUser = _auth.currentUser;
@@ -40,7 +93,8 @@ class ConnectionService {
       return false;
     }
   }
-    Future<String> getConnectionStatus(String otherUserId) async {
+
+  Future<String> getConnectionStatus(String otherUserId) async {
     final currentUser = _auth.currentUser;
 
     if (currentUser == null) return "connect";
@@ -104,7 +158,8 @@ class ConnectionService {
       await doc.reference.delete();
     }
   }
-    Stream<String> getConnectionStatusStream(String otherUserId) {
+
+  Stream<String> getConnectionStatusStream(String otherUserId) {
     final currentUser = _auth.currentUser;
 
     if (currentUser == null) {
@@ -123,15 +178,13 @@ class ConnectionService {
         final status = data["status"];
 
         // Current user sent request
-        if (senderId == currentUser.uid &&
-            receiverId == otherUserId) {
+        if (senderId == currentUser.uid && receiverId == otherUserId) {
           if (status == "pending") return "requested";
           if (status == "accepted") return "connected";
         }
 
         // Other user sent request
-        if (senderId == otherUserId &&
-            receiverId == currentUser.uid) {
+        if (senderId == otherUserId && receiverId == currentUser.uid) {
           if (status == "pending") return "received";
           if (status == "accepted") return "connected";
         }
@@ -147,10 +200,7 @@ class ConnectionService {
   ) async {
     final currentUser = _auth.currentUser!;
 
-    await _firestore
-        .collection("connection_requests")
-        .doc(requestId)
-        .update({
+    await _firestore.collection("connection_requests").doc(requestId).update({
       "status": "accepted",
     });
 
@@ -162,10 +212,7 @@ class ConnectionService {
   }
 
   Future<void> rejectRequest(String requestId) async {
-    await _firestore
-        .collection("connection_requests")
-        .doc(requestId)
-        .update({
+    await _firestore.collection("connection_requests").doc(requestId).update({
       "status": "rejected",
     });
   }

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first_app/constants/app_colors.dart';
+import 'package:first_app/screens/Profile/complete_profile_screen.dart';
 import 'package:first_app/screens/auth/login_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -14,57 +15,72 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool isPasswordHidden = true;
   bool isConfirmPasswordHidden = true;
 
-    // Firebase Auth
-final FirebaseAuth _auth = FirebaseAuth.instance;
+  // Firebase Auth
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
 // Text Controllers
-final TextEditingController fullNameController = TextEditingController();
-final TextEditingController emailController = TextEditingController();
-final TextEditingController passwordController = TextEditingController();
-final TextEditingController confirmPasswordController =
-    TextEditingController();
+  final TextEditingController fullNameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
+  Future<void> signUp() async {
+    if (passwordController.text.trim() !=
+        confirmPasswordController.text.trim()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Passwords do not match"),
+        ),
+      );
+      return;
+    }
 
-Future<void> signUp() async {
-  if (passwordController.text.trim() !=
-      confirmPasswordController.text.trim()) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Passwords do not match"),
-      ),
-    );
-    return;
+    try {
+      await _auth.createUserWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+
+      if (!context.mounted) return;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const CompleteProfileScreen(),
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? "Signup Failed")),
+      );
+      void initState() {
+        super.initState();
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Account Created Successfully"),
+            ),
+          );
+        });
+      }
+
+      fullNameController.clear();
+      emailController.clear();
+      passwordController.clear();
+      confirmPasswordController.clear();
+
+      // TODO: Navigate to Home Screen
+    } on FirebaseAuthException catch (e) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message ?? "Something went wrong"),
+        ),
+      );
+    }
   }
-
-  try {
-    await _auth.createUserWithEmailAndPassword(
-      email: emailController.text.trim(),
-      password: passwordController.text.trim(),
-    );
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Account Created Successfully"),
-      ),
-    );
-
-    fullNameController.clear();
-    emailController.clear();
-    passwordController.clear();
-    confirmPasswordController.clear();
-
-    // TODO: Navigate to Home Screen
-  } on FirebaseAuthException catch (e) {
-    // ignore: use_build_context_synchronously
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(e.message ?? "Something went wrong"),
-      ),
-    );
-  }
-}
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -89,14 +105,15 @@ Future<void> signUp() async {
                     borderRadius: BorderRadius.circular(28),
                     boxShadow: [
                       BoxShadow(
-                        color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                        color:
+                            theme.colorScheme.primary.withValues(alpha: 0.25),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
                     ],
                   ),
                   child: const Icon(
-                   Icons.rocket_launch_rounded,
+                    Icons.rocket_launch_rounded,
                     color: Colors.white,
                     size: 60,
                   ),
@@ -126,19 +143,18 @@ Future<void> signUp() async {
               const SizedBox(height: 40),
 
               /// Full Name
-               TextField(
+              TextField(
                 controller: fullNameController,
                 decoration: const InputDecoration(
                   labelText: "Full Name",
                   prefixIcon: Icon(Icons.person_outline),
-                  
                 ),
               ),
 
               const SizedBox(height: 20),
 
               /// Email
-               TextField(
+              TextField(
                 controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
@@ -196,7 +212,7 @@ Future<void> signUp() async {
               ),
 
               const SizedBox(height: 36),
-                  //height changed
+              //height changed
 
               /// Create Account Button
               SizedBox(
@@ -215,11 +231,11 @@ Future<void> signUp() async {
                   TextButton(
                     onPressed: () {
                       Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const LoginScreen(),
-                      ),
-                    );
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const LoginScreen(),
+                        ),
+                      );
                     },
                     child: const Text("Sign In"),
                   ),
