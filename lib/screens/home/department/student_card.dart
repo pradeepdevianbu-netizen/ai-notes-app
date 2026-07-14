@@ -1,3 +1,4 @@
+import 'package:first_app/screens/chat/chat_screen.dart';
 import 'package:first_app/screens/connection/service/connection_service.dart';
 import 'package:flutter/material.dart';
 
@@ -218,13 +219,20 @@ class _StudentCardState extends State<StudentCard> {
 
                     final status = snapshot.data!;
 
-                    //
-
-                    if (status == "connect") {
+                    if (status == "connected") {
                       return ElevatedButton.icon(
-                        onPressed: widget.onConnect,
-                        icon: const Icon(Icons.person_add_alt_1),
-                        label: const Text("Connect"),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ChatScreen(
+                                otherUser: widget.student,
+                              ),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.chat_bubble_outline),
+                        label: const Text("Message"),
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size.fromHeight(46),
                           backgroundColor: Colors.blue,
@@ -235,6 +243,10 @@ class _StudentCardState extends State<StudentCard> {
                         ),
                       );
                     }
+
+                    if (status == "requested") {
+                      // Requested button
+                    } //
                     if (status == "requested") {
                       return ElevatedButton.icon(
                         onPressed: () async {
