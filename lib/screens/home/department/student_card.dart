@@ -203,7 +203,6 @@ class _StudentCardState extends State<StudentCard> {
           ),
 
           const SizedBox(height: 16),
-
           Row(
             children: [
               Expanded(
@@ -245,21 +244,18 @@ class _StudentCardState extends State<StudentCard> {
                     }
 
                     if (status == "requested") {
-                      // Requested button
-                    } //
-                    if (status == "requested") {
                       return ElevatedButton.icon(
                         onPressed: () async {
                           await ConnectionService()
                               .cancelRequest(widget.student["uid"]);
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                isRequested ? "Requested" : "Connect",
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Request Cancelled"),
                               ),
-                            ),
-                          );
+                            );
+                          }
                         },
                         icon: const Icon(Icons.close),
                         label: const Text("Requested"),
@@ -274,14 +270,13 @@ class _StudentCardState extends State<StudentCard> {
                       );
                     }
 
-                    if (status == "connected") {
+                    if (status == "received") {
                       return ElevatedButton.icon(
                         onPressed: null,
-                        icon: const Icon(Icons.check_circle),
-                        label: const Text("Connected"),
+                        icon: const Icon(Icons.person),
+                        label: const Text("Request Received"),
                         style: ElevatedButton.styleFrom(
-                          disabledBackgroundColor:
-                              const Color(0xFF22C55E), // Bright Green
+                          disabledBackgroundColor: Colors.green,
                           disabledForegroundColor: Colors.white,
                           minimumSize: const Size.fromHeight(46),
                           shape: RoundedRectangleBorder(
@@ -299,6 +294,9 @@ class _StudentCardState extends State<StudentCard> {
                         minimumSize: const Size.fromHeight(46),
                         backgroundColor: Colors.blue,
                         foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
                     );
                   },

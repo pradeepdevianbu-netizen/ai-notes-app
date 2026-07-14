@@ -18,14 +18,12 @@ class ConnectionRequestsScreen extends StatelessWidget {
         elevation: 0,
         title: const Text("Connection Requests"),
       ),
-
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection("connection_requests")
             .where("receiverId", isEqualTo: uid)
             .where("status", isEqualTo: "pending")
             .snapshots(),
-
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -60,7 +58,6 @@ class ConnectionRequestsScreen extends StatelessWidget {
                     .collection("users")
                     .doc(senderId)
                     .get(),
-
                 builder: (context, userSnapshot) {
                   if (!userSnapshot.hasData) {
                     return const SizedBox();
@@ -76,10 +73,8 @@ class ConnectionRequestsScreen extends StatelessWidget {
                       color: const Color(0xFF1E293B),
                       borderRadius: BorderRadius.circular(22),
                     ),
-
                     child: Column(
                       children: [
-
                         CircleAvatar(
                           radius: 35,
                           child: Text(
@@ -87,9 +82,7 @@ class ConnectionRequestsScreen extends StatelessWidget {
                             style: const TextStyle(fontSize: 25),
                           ),
                         ),
-
                         const SizedBox(height: 15),
-
                         Text(
                           sender["name"],
                           style: const TextStyle(
@@ -98,59 +91,53 @@ class ConnectionRequestsScreen extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-
                         const SizedBox(height: 5),
-
                         Text(
                           "${sender["department"]} • ${sender["year"]}",
                           style: const TextStyle(
                             color: Colors.white70,
                           ),
                         ),
-
                         const SizedBox(height: 8),
-
                         const Text(
                           "Wants to connect with you",
                           style: TextStyle(
                             color: Colors.white54,
                           ),
                         ),
-
                         const SizedBox(height: 20),
-
                         Row(
                           children: [
-
                             Expanded(
                               child: OutlinedButton(
                                 onPressed: () async {
-
                                   await service.rejectRequest(
                                     request.id,
                                   );
-
                                 },
                                 child: const Text("Reject"),
                               ),
                             ),
-
                             const SizedBox(width: 12),
-
                             Expanded(
                               child: ElevatedButton(
                                 onPressed: () async {
-
+                                  await service.acceptRequest(
+                                    request.id,
+                                    senderId,
+                                  );
                                   await service.acceptRequest(
                                     request.id,
                                     senderId,
                                   );
 
+                                  if (context.mounted) {
+                                    Navigator.pop(context);
+                                  }
                                 },
                                 child: const Text("Accept"),
                               ),
                             ),
-
                           ],
                         )
                       ],
