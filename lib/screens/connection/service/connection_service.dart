@@ -5,59 +5,33 @@ class ConnectionService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<bool> checkRequest(String userId) async {
-  final currentUser = _auth.currentUser;
-
-  if (currentUser == null) return false;
-
-  final query = await _firestore
-      .collection("connections")
-      .where("senderId", isEqualTo: userId)
-      .where("receiverId", isEqualTo: currentUser.uid)
-      .get();
-
-  return query.docs.isNotEmpty;
-}
-  
-  Future<void> disconnect(String otherUserId) async {
+  /// Check already connected
+  Future<bool> checkRequest(String otherUserId) async {
     final currentUser = _auth.currentUser;
 
-    if (currentUser == null) return;
+    if (currentUser == null) return false;
 
-    // Delete accepted request
-    final requestSnapshot = await _firestore
-        .collection("connection_requests")
-        .where("status", isEqualTo: "accepted")
+    final snapshot = await _firestore
+        .collection("connections")
+        .where(
+          Filter.or(
+            Filter.and(
+              Filter("user1", isEqualTo: currentUser.uid),
+              Filter("user2", isEqualTo: otherUserId),
+            ),
+            Filter.and(
+              Filter("user1", isEqualTo: otherUserId),
+              Filter("user2", isEqualTo: currentUser.uid),
+            ),
+          ),
+        )
+        .limit(1)
         .get();
 
-    for (final doc in requestSnapshot.docs) {
-      final data = doc.data();
-
-      final senderId = data["senderId"];
-      final receiverId = data["receiverId"];
-
-      if ((senderId == currentUser.uid && receiverId == otherUserId) ||
-          (senderId == otherUserId && receiverId == currentUser.uid)) {
-        await doc.reference.delete();
-      }
-    }
-
-    // Delete connection
-    final connectionSnapshot = await _firestore.collection("connections").get();
-
-    for (final doc in connectionSnapshot.docs) {
-      final data = doc.data();
-
-      final user1 = data["user1"];
-      final user2 = data["user2"];
-
-      if ((user1 == currentUser.uid && user2 == otherUserId) ||
-          (user1 == otherUserId && user2 == currentUser.uid)) {
-        await doc.reference.delete();
-      }
-    }
+    return snapshot.docs.isNotEmpty;
   }
 
+  /// Send Request
   Future<bool> sendConnectionRequest(String receiverId) async {
     try {
       final currentUser = _auth.currentUser;
@@ -70,14 +44,30 @@ class ConnectionService {
 
       final existingRequest = await _firestore
           .collection("connection_requests")
-          .where("senderId", isEqualTo: currentUser.uid)
-          .where("receiverId", isEqualTo: receiverId)
-          .where("status", isEqualTo: "pending")
+          .where(
+            Filter.or(
+              Filter.and(
+                Filter("senderId", isEqualTo: currentUser.uid),
+                Filter("receiverId", isEqualTo: receiverId),
+              ),
+              Filter.and(
+                Filter("senderId", isEqualTo: receiverId),
+                Filter("receiverId", isEqualTo: currentUser.uid),
+              ),
+            ),
+          )
           .limit(1)
           .get();
 
       if (existingRequest.docs.isNotEmpty) {
-        return false;
+        final doc = existingRequest.docs.first;
+        final status = doc["status"];
+
+        if (status == "pending" || status == "accepted") {
+          return false;
+        }
+
+        await doc.reference.delete();
       }
 
       await _firestore.collection("connection_requests").add({
@@ -94,54 +84,52 @@ class ConnectionService {
     }
   }
 
-  Future<String> getConnectionStatus(String otherUserId) async {
+  /// Connection Status Stream
+  Stream<String> getConnectionStatusStream(String otherUserId) {
     final currentUser = _auth.currentUser;
 
-    if (currentUser == null) return "connect";
+    if (currentUser == null) {
+      return Stream.value("connect");
+    }
 
-    // Check request sent by current user
-    final sentRequest = await _firestore
+    return _firestore
         .collection("connection_requests")
-        .where("senderId", isEqualTo: currentUser.uid)
-        .where("receiverId", isEqualTo: otherUserId)
-        .limit(1)
-        .get();
-
-    if (sentRequest.docs.isNotEmpty) {
-      final status = sentRequest.docs.first["status"];
-
-      if (status == "pending") {
-        return "requested";
+        .where(
+          Filter.or(
+            Filter.and(
+              Filter("senderId", isEqualTo: currentUser.uid),
+              Filter("receiverId", isEqualTo: otherUserId),
+            ),
+            Filter.and(
+              Filter("senderId", isEqualTo: otherUserId),
+              Filter("receiverId", isEqualTo: currentUser.uid),
+            ),
+          ),
+        )
+        .snapshots()
+        .map((snapshot) {
+      if (snapshot.docs.isEmpty) {
+        return "connect";
       }
+
+      final data = snapshot.docs.first.data();
+
+      final status = data["status"];
+      final senderId = data["senderId"];
 
       if (status == "accepted") {
         return "connected";
       }
-    }
-
-    // Check request received from other user
-    final receivedRequest = await _firestore
-        .collection("connection_requests")
-        .where("senderId", isEqualTo: otherUserId)
-        .where("receiverId", isEqualTo: currentUser.uid)
-        .limit(1)
-        .get();
-
-    if (receivedRequest.docs.isNotEmpty) {
-      final status = receivedRequest.docs.first["status"];
 
       if (status == "pending") {
-        return "received";
+        return senderId == currentUser.uid ? "requested" : "received";
       }
 
-      if (status == "accepted") {
-        return "connected";
-      }
-    }
-
-    return "connect";
+      return "connect";
+    });
   }
 
+  /// Cancel Request
   Future<void> cancelRequest(String receiverId) async {
     final currentUser = _auth.currentUser;
 
@@ -159,41 +147,7 @@ class ConnectionService {
     }
   }
 
-  Stream<String> getConnectionStatusStream(String otherUserId) {
-    final currentUser = _auth.currentUser;
-
-    if (currentUser == null) {
-      return Stream.value("connect");
-    }
-
-    return _firestore
-        .collection("connection_requests")
-        .snapshots()
-        .map((snapshot) {
-      for (final doc in snapshot.docs) {
-        final data = doc.data();
-
-        final senderId = data["senderId"];
-        final receiverId = data["receiverId"];
-        final status = data["status"];
-
-        // Current user sent request
-        if (senderId == currentUser.uid && receiverId == otherUserId) {
-          if (status == "pending") return "requested";
-          if (status == "accepted") return "connected";
-        }
-
-        // Other user sent request
-        if (senderId == otherUserId && receiverId == currentUser.uid) {
-          if (status == "pending") return "received";
-          if (status == "accepted") return "connected";
-        }
-      }
-
-      return "connect";
-    });
-  }
-
+  /// Accept Request
   Future<void> acceptRequest(
     String requestId,
     String senderId,
@@ -211,9 +165,44 @@ class ConnectionService {
     });
   }
 
+  /// Reject Request
   Future<void> rejectRequest(String requestId) async {
     await _firestore.collection("connection_requests").doc(requestId).update({
       "status": "rejected",
     });
+  }
+
+  /// Disconnect
+  Future<void> disconnect(String otherUserId) async {
+    final currentUser = _auth.currentUser;
+
+    if (currentUser == null) return;
+
+    final requestSnapshot = await _firestore
+        .collection("connection_requests")
+        .where("status", isEqualTo: "accepted")
+        .get();
+
+    for (final doc in requestSnapshot.docs) {
+      final data = doc.data();
+
+      if ((data["senderId"] == currentUser.uid &&
+              data["receiverId"] == otherUserId) ||
+          (data["senderId"] == otherUserId &&
+              data["receiverId"] == currentUser.uid)) {
+        await doc.reference.delete();
+      }
+    }
+
+    final connectionSnapshot = await _firestore.collection("connections").get();
+
+    for (final doc in connectionSnapshot.docs) {
+      final data = doc.data();
+
+      if ((data["user1"] == currentUser.uid && data["user2"] == otherUserId) ||
+          (data["user1"] == otherUserId && data["user2"] == currentUser.uid)) {
+        await doc.reference.delete();
+      }
+    }
   }
 }

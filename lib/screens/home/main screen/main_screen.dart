@@ -1,8 +1,9 @@
 import 'package:first_app/screens/home/home_screen.dart';
-import 'package:first_app/screens/home/main%20screen/connection_screen.dart';
-import 'package:first_app/screens/home/main%20screen/message_screen.dart';
-import 'package:first_app/screens/home/main%20screen/notification_screen.dart';
-import 'package:first_app/screens/home/main%20screen/profile_screen.dart';
+import 'package:first_app/screens/home/main screen/connection_screen.dart';
+import 'package:first_app/screens/home/main screen/message_screen.dart';
+import 'package:first_app/screens/home/main screen/notification_screen.dart';
+import 'package:first_app/screens/home/main screen/profile_screen.dart';
+import 'package:first_app/services/presence_service.dart';
 import 'package:flutter/material.dart';
 
 class MainScreen extends StatefulWidget {
@@ -12,7 +13,11 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen>
+    with WidgetsBindingObserver {
+
+  final PresenceService _presence = PresenceService();
+
   int selectedIndex = 0;
 
   final List<Widget> pages = const [
@@ -22,6 +27,39 @@ class _MainScreenState extends State<MainScreen> {
     NotificationScreen(),
     ProfileScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
+
+    _presence.setOnline();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        _presence.setOnline();
+        break;
+
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
+        _presence.setOffline();
+        break;
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _presence.setOffline();
+    super.dispose();
+  }
+
   Widget _navItem({
     required int index,
     required IconData icon,
@@ -43,7 +81,9 @@ class _MainScreenState extends State<MainScreen> {
           vertical: 10,
         ),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFF5B8CFF) : Colors.transparent,
+          color: selected
+              ? const Color(0xFF5B8CFF)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(18),
         ),
         child: Column(
@@ -63,7 +103,9 @@ class _MainScreenState extends State<MainScreen> {
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 11,
-                fontWeight: selected ? FontWeight.bold : FontWeight.w500,
+                fontWeight: selected
+                    ? FontWeight.bold
+                    : FontWeight.w500,
               ),
             ),
           ],
@@ -86,25 +128,26 @@ class _MainScreenState extends State<MainScreen> {
           icon: icon,
           label: label,
         ),
-        Positioned(
-          right: 4,
-          top: -2,
-          child: Container(
-            padding: const EdgeInsets.all(5),
-            decoration: const BoxDecoration(
-              color: Colors.red,
-              shape: BoxShape.circle,
-            ),
-            child: Text(
-              badge.toString(),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 9,
-                fontWeight: FontWeight.bold,
+        if (badge > 0)
+          Positioned(
+            right: 4,
+            top: -2,
+            child: Container(
+              padding: const EdgeInsets.all(5),
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+              ),
+              child: Text(
+                badge.toString(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 9,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
-        ),
       ],
     );
   }
@@ -124,7 +167,9 @@ class _MainScreenState extends State<MainScreen> {
         duration: const Duration(milliseconds: 250),
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFF5B8CFF) : Colors.transparent,
+          color: selected
+              ? const Color(0xFF5B8CFF)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: const CircleAvatar(
