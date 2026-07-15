@@ -5,9 +5,6 @@ class ChatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-
-  
-
   String getChatId(String otherUserId) {
     final currentUid = _auth.currentUser!.uid;
 
@@ -17,41 +14,39 @@ class ChatService {
   }
 
   Future<void> setTyping({
-  required String otherUserId,
-  required bool isTyping,
-}) async {
-  final currentUid = _auth.currentUser!.uid;
-  final chatId = getChatId(otherUserId);
+    required String otherUserId,
+    required bool isTyping,
+    String? replyToMessage,
+    String? replyToSender,
+  }) async {
+    final currentUid = _auth.currentUser!.uid;
+    final chatId = getChatId(otherUserId);
 
-  await _firestore.collection("chats").doc(chatId).set({
-    "typing.$currentUid": isTyping,
-  }, SetOptions(merge: true));
-}
+    await _firestore.collection("chats").doc(chatId).set({
+      "typing.$currentUid": isTyping,
+    }, SetOptions(merge: true));
+  }
 
+  Stream<bool> getTypingStatus(String otherUserId) {
+    final currentUid = _auth.currentUser!.uid;
+    final chatId = getChatId(otherUserId);
 
-Stream<bool> getTypingStatus(String otherUserId) {
-  final currentUid = _auth.currentUser!.uid;
-  final chatId = getChatId(otherUserId);
+    return _firestore.collection("chats").doc(chatId).snapshots().map((doc) {
+      if (!doc.exists) return false;
 
-  return _firestore
-      .collection("chats")
-      .doc(chatId)
-      .snapshots()
-      .map((doc) {
-    if (!doc.exists) return false;
+      final data = doc.data() as Map<String, dynamic>;
 
-    final data = doc.data() as Map<String, dynamic>;
+      final typing = data["typing"] ?? {};
 
-    final typing = data["typing"] ?? {};
-
-    return typing[otherUserId] ?? false;
-  });
-}
-
+      return typing[otherUserId] ?? false;
+    });
+  }
 
   Future<void> sendMessage({
     required String otherUserId,
     required String text,
+    String? replyToMessage,
+    String? replyToSender,
   }) async {
     if (text.trim().isEmpty) return;
 
@@ -63,7 +58,6 @@ Stream<bool> getTypingStatus(String otherUserId) {
     final messageRef = chatRef.collection("messages").doc();
 
     final batch = _firestore.batch();
-
     batch.set(
       chatRef,
       {
@@ -74,34 +68,27 @@ Stream<bool> getTypingStatus(String otherUserId) {
       },
       SetOptions(merge: true),
     );
-    
-  
 
-   batch.set(messageRef, {
-  "senderId": currentUid,
-  "receiverId": otherUserId,
-  "text": text.trim(),
-
-  "timestamp": FieldValue.serverTimestamp(),
-
-  "isRead": false,
-  "readAt": null,
-
-  "isDeleted": false,
-  "deletedAt": null,
-
-  "deletedFor": {},
-
-  "replyTo": null,
-
-  "reactions": {},
-
-  "isEdited": false,
-});
+    batch.set(messageRef, {
+      "senderId": currentUid,
+      "receiverId": otherUserId,
+      "text": text.trim(),
+      "timestamp": FieldValue.serverTimestamp(),
+      "isRead": false,
+      "readAt": null,
+      "isDeleted": false,
+      "deletedAt": null,
+      "deletedFor": {},
+      "replyTo": null,
+      "reactions": {},
+      "isEdited": false,
+      "replyToMessage": replyToMessage,
+      "replyToSender": replyToSender,
+    });
 
     await batch.commit();
   }
-  
+
   Stream<QuerySnapshot<Map<String, dynamic>>> getMessages(
     String otherUserId,
   ) {
@@ -115,32 +102,32 @@ Stream<bool> getTypingStatus(String otherUserId) {
         .snapshots();
   }
 
- Future<void> markMessagesAsRead(String otherUserId) async {
-  final currentUid = _auth.currentUser!.uid;
+  Future<void> markMessagesAsRead(String otherUserId) async {
+    final currentUid = _auth.currentUser!.uid;
 
-  final chatId = getChatId(otherUserId);
+    final chatId = getChatId(otherUserId);
 
-  final snapshot = await _firestore
-      .collection("chats")
-      .doc(chatId)
-      .collection("messages")
-      .where("receiverId", isEqualTo: currentUid)
-      .where("isRead", isEqualTo: false)
-      .get();
+    final snapshot = await _firestore
+        .collection("chats")
+        .doc(chatId)
+        .collection("messages")
+        .where("receiverId", isEqualTo: currentUid)
+        .where("isRead", isEqualTo: false)
+        .get();
 
-  if (snapshot.docs.isEmpty) return;
+    if (snapshot.docs.isEmpty) return;
 
-  final batch = _firestore.batch();
+    final batch = _firestore.batch();
 
-  for (final doc in snapshot.docs) {
-    batch.update(doc.reference, {
-      "isRead": true,
-      "readAt": FieldValue.serverTimestamp(),
-    });
+    for (final doc in snapshot.docs) {
+      batch.update(doc.reference, {
+        "isRead": true,
+        "readAt": FieldValue.serverTimestamp(),
+      });
+    }
+
+    await batch.commit();
   }
-
-  await batch.commit();
-}
 
   Future<void> deleteForEveryone({
     required String otherUserId,
