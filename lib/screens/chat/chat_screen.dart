@@ -22,7 +22,11 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final PresenceService _presence = PresenceService();
+  final FocusNode _focusNode = FocusNode();
+  final TextEditingController searchController = TextEditingController();
+  String searchQuery = "";
 
+  int _lastMessageCount = 0;
   bool _isTyping = false;
 
   String? replyMessage;
@@ -41,6 +45,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void dispose() {
     messageController.dispose();
     _scrollController.dispose();
+    _focusNode.dispose();
 
     super.dispose();
   }
@@ -58,6 +63,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: const Color(0xFFF5F7FB),
       appBar: AppBar(
         elevation: 0,
@@ -71,27 +77,36 @@ class _ChatScreenState extends State<ChatScreen> {
             }
 
             final data = snapshot.data!.data();
-
             final isOnline = data?["isOnline"] ?? false;
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.otherUser["name"],
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  isOnline ? "Online" : "Offline",
-                  style: TextStyle(
-                    color: isOnline ? Colors.green : Colors.grey,
-                    fontSize: 13,
-                  ),
-                ),
-              ],
+            return StreamBuilder<bool>(
+              stream: _chatService.getTypingStatus(widget.otherUser["uid"]),
+              builder: (context, typingSnapshot) {
+                final isTyping = typingSnapshot.data ?? false;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.otherUser["name"],
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      isTyping
+                          ? "Typing..."
+                          : (isOnline ? "Online" : "Offline"),
+                      style: TextStyle(
+                        color: isTyping
+                            ? Colors.blue
+                            : (isOnline ? Colors.green : Colors.grey),
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                );
+              },
             );
           },
         ),
@@ -100,7 +115,7 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           /// Messages
           Expanded(
-            child: StreamBuilder<QuerySnapshot>(
+            child: StreamBuilder(
               stream: _chatService.getMessages(widget.otherUser["uid"]),
               builder: (context, snapshot) {
                 _chatService.markMessagesAsRead(
@@ -112,16 +127,26 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: CircularProgressIndicator(),
                   );
                 }
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (_scrollController.hasClients) {
+                    _scrollController.animateTo(
+                      _scrollController.position.maxScrollExtent,
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeOut,
+                    );
+                  }
+                });
 
                 final docs = snapshot.data!.docs;
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  _scrollToBottom();
-                });
+
                 final currentUid = FirebaseAuth.instance.currentUser!.uid;
 
                 return ListView.builder(
                   controller: _scrollController,
-                  padding: const EdgeInsets.all(16),
+                  reverse: false,
+                  padding: const EdgeInsets.only(bottom: 80),
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
                   itemCount: docs.length,
                   itemBuilder: (context, index) {
                     final data = docs[index].data() as Map<String, dynamic>;
@@ -177,123 +202,159 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
 
           /// Message Input
-          SafeArea(
-            child: Container(
+        ],
+      ),
+      bottomNavigationBar: AnimatedPadding(
+        duration: const Duration(milliseconds: 200),
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: SafeArea(
+          child: Container(
+            margin: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
               color: Colors.white,
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (replyMessage != null)
-                    Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.only(bottom: 10),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  replySender!,
-                                  style: const TextStyle(
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(replyMessage!),
-                              ],
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: () {
-                              setState(() {
-                                replyMessage = null;
-                                replySender = null;
-                              });
-                            },
-                          ),
-                        ],
-                      ),
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 10,
+                  offset: Offset(0, -2),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (replyMessage != null)
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(.08),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: messageController,
-                          onChanged: (value) async {
-                            if (value.isNotEmpty && !_isTyping) {
-                              _isTyping = true;
-
-                              await _chatService.setTyping(
-                                otherUserId: widget.otherUser["uid"],
-                                isTyping: true,
-                              );
-                            }
-
-                            if (value.isEmpty && _isTyping) {
-                              _isTyping = false;
-
-                              await _chatService.setTyping(
-                                otherUserId: widget.otherUser["uid"],
-                                isTyping: false,
-                              );
-                            }
-                          },
-                          decoration: InputDecoration(
-                            hintText: "Type a message...",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(25),
-                            ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 4,
+                          height: 40,
+                          color: Colors.blue,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                replySender!,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                              Text(
+                                replyMessage!,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 10),
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor: Colors.blue,
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.send,
-                            color: Colors.white,
-                          ),
-                          onPressed: () async {
-                            await _chatService.sendMessage(
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              replyMessage = null;
+                              replySender = null;
+                            });
+                          },
+                          icon: const Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                // TextField here...
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: messageController,
+                        focusNode: _focusNode,
+                        onTap: () {
+                          Future.delayed(const Duration(milliseconds: 250), () {
+                            _scrollToBottom();
+                          });
+                        },
+                        onChanged: (value) async {
+                          if (value.isNotEmpty && !_isTyping) {
+                            setState(() => _isTyping = true);
+
+                            await _chatService.setTyping(
                               otherUserId: widget.otherUser["uid"],
-                              text: messageController.text,
-                              replyToMessage: replyMessage,
-                              replyToSender: replySender,
+                              isTyping: true,
                             );
+                          }
+
+                          if (value.isEmpty && _isTyping) {
+                            setState(() => _isTyping = false);
 
                             await _chatService.setTyping(
                               otherUserId: widget.otherUser["uid"],
                               isTyping: false,
                             );
-
-                            messageController.clear();
-
-                            setState(() {
-                              replyMessage = null;
-                              replySender = null;
-                              _isTyping = false;
-                            });
-                          },
+                          }
+                        },
+                        decoration: InputDecoration(
+                          hintText: "Type a message...",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
                         ),
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                    const SizedBox(width: 10),
+                    CircleAvatar(
+                      radius: 24,
+                      backgroundColor: Colors.blue,
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.send,
+                          color: Colors.white,
+                        ),
+                        onPressed: () async {
+                          await _chatService.sendMessage(
+                            otherUserId: widget.otherUser["uid"],
+                            text: messageController.text,
+                            replyToMessage: replyMessage,
+                            replyToSender: replySender,
+                          );
+                          _isTyping = false;
+
+                          await _chatService.setTyping(
+                            otherUserId: widget.otherUser["uid"],
+                            isTyping: false,
+                          );
+
+                          messageController.clear();
+
+                          setState(() {
+                            replyMessage = null;
+                            replySender = null;
+                            _isTyping = false;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
