@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first_app/screens/chat/chat_screen.dart';
 import 'package:flutter/material.dart';
 
-
-
 class MessagesScreen extends StatelessWidget {
   const MessagesScreen({super.key});
 
@@ -38,57 +36,127 @@ class MessagesScreen extends StatelessWidget {
           }
 
           return ListView.builder(
-            itemCount: chats.length,
-            itemBuilder: (context, index) {
-              final chat = chats[index];
+              itemCount: chats.length,
+              itemBuilder: (context, index) {
+                final chat = chats[index];
 
-              final participants =
-                  List<String>.from(chat["participants"]);
+                final participants = List<String>.from(chat["participants"]);
 
-              final otherUid =
-                  participants.firstWhere((e) => e != currentUid);
+                final otherUid =
+                    participants.firstWhere((e) => e != currentUid);
 
-              return FutureBuilder<DocumentSnapshot>(
-                future: FirebaseFirestore.instance
-                    .collection("users")
-                    .doc(otherUid)
-                    .get(),
-                builder: (context, userSnap) {
-                  if (!userSnap.hasData) {
-                    return const SizedBox();
-                  }
+                return FutureBuilder<DocumentSnapshot>(
+                    future: FirebaseFirestore.instance
+                        .collection("users")
+                        .doc(otherUid)
+                        .get(),
+                    builder: (context, userSnap) {
+                      if (!userSnap.hasData) {
+                        return const SizedBox();
+                      }
 
-                  final user =
-                      userSnap.data!.data() as Map<String, dynamic>;
+                      final user =
+                          userSnap.data!.data() as Map<String, dynamic>;
 
-                  return ListTile(
-                    leading: CircleAvatar(
-                      child: Text(
-                        user["name"][0].toUpperCase(),
-                      ),
-                    ),
-                    title: Text(user["name"]),
-                    subtitle: Text(
-                      chat["lastMessage"] ?? "",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ChatScreen(
-                            otherUser: user,
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ChatScreen(
+                                  otherUser: user,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 28,
+                                  backgroundColor: Colors.blue.shade100,
+                                  child: Text(
+                                    user["name"][0].toUpperCase(),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        user["name"],
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        chat["lastMessage"] ?? "",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: Colors.grey.shade700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      chat["lastMessageTime"] != null
+                                          ? TimeOfDay.fromDateTime(
+                                              (chat["lastMessageTime"]
+                                                      as Timestamp)
+                                                  .toDate(),
+                                            ).format(context)
+                                          : "",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    const Icon(
+                                      Icons.chevron_right,
+                                      color: Colors.grey,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );
-                    },
-                  );
-                },
-              );
-            },
-          );
+                    });
+              });
         },
       ),
     );

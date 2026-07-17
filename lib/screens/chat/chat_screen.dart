@@ -6,6 +6,24 @@ import 'package:intl/intl.dart';
 import 'package:first_app/services/presence_service.dart';
 
 class ChatScreen extends StatefulWidget {
+  Widget buildMessageBubble(
+    Map<String, dynamic> data,
+    bool isMe,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isMe ? const Color(0xFF0084FF) : Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: const Radius.circular(18),
+          topRight: const Radius.circular(18),
+          bottomLeft: Radius.circular(isMe ? 18 : 5),
+          bottomRight: Radius.circular(isMe ? 5 : 18),
+        ),
+      ),
+      child: Text(data["text"]),
+    );
+  }
+
   final Map<String, dynamic> otherUser;
 
   const ChatScreen({
@@ -24,12 +42,13 @@ class _ChatScreenState extends State<ChatScreen> {
   final PresenceService _presence = PresenceService();
   final FocusNode _focusNode = FocusNode();
   final TextEditingController searchController = TextEditingController();
+
   String searchQuery = "";
 
   int _lastMessageCount = 0;
   bool _isTyping = false;
 
-  String? replyMessage;
+  Map<String, dynamic>? replyMessage;
   String? replySender;
 
   @override
@@ -83,6 +102,7 @@ class _ChatScreenState extends State<ChatScreen> {
               stream: _chatService.getTypingStatus(widget.otherUser["uid"]),
               builder: (context, typingSnapshot) {
                 final isTyping = typingSnapshot.data ?? false;
+
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -150,8 +170,13 @@ class _ChatScreenState extends State<ChatScreen> {
                   itemCount: docs.length,
                   itemBuilder: (context, index) {
                     final data = docs[index].data() as Map<String, dynamic>;
+                    final status = data["status"] ?? "sent";
+                    final isRead = data["isRead"] ?? false;
 
                     final bool isMe = data["senderId"] == currentUid;
+
+                    final bool isReplyMine = replyMessage != null &&
+                        replyMessage!["senderId"] == currentUid;
 
                     final Timestamp? ts = data["timestamp"];
 
@@ -160,38 +185,70 @@ class _ChatScreenState extends State<ChatScreen> {
                     if (ts != null) {
                       time = DateFormat("hh:mm a").format(ts.toDate());
                     }
-
                     return Align(
                       alignment:
                           isMe ? Alignment.centerRight : Alignment.centerLeft,
-                      child: Container(
-                        margin: const EdgeInsets.only(bottom: 10),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: isMe ? Colors.blue : Colors.grey.shade300,
-                          borderRadius: BorderRadius.circular(14),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.75,
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              data["text"],
-                              style: TextStyle(
-                                color: isMe ? Colors.white : Colors.black,
-                                fontSize: 16,
-                              ),
+                        child: IntrinsicWidth(
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 4,
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              time,
-                              style: TextStyle(
-                                color: isMe
-                                    ? Colors.white70
-                                    : Colors.grey.shade700,
-                                fontSize: 11,
-                              ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
                             ),
-                          ],
+                            decoration: BoxDecoration(
+                              color: isMe ? Colors.blue : Colors.grey.shade300,
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Message
+                                  Text(
+                                    data["text"],
+                                    style: TextStyle(
+                                      color: isMe ? Colors.white : Colors.black,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 2),
+
+                                  // Time + Tick
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        time,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: isMe
+                                              ? Colors.white70
+                                              : Colors.grey,
+                                        ),
+                                      ),
+                                      if (isMe) ...[
+                                        const SizedBox(width: 4),
+                                        Icon(
+                                          isRead ? Icons.done_all : Icons.done,
+                                          size: 16,
+                                          color: isRead
+                                              ? Colors.lightBlueAccent
+                                              : Colors.white70,
+                                        )
+                                      ],
+                                    ],
+                                  ),
+                                ]),
+                          ),
                         ),
                       ),
                     );
@@ -211,12 +268,26 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         child: SafeArea(
           child: Container(
-            margin: const EdgeInsets.all(12),
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.75,
+            ),
+            margin: const EdgeInsets.symmetric(
+              horizontal: 10,
+              vertical: 4,
+            ),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 10,
+            ),
+            decoration: const BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: const [
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(18),
+                topRight: Radius.circular(18),
+                bottomLeft: Radius.circular(18),
+                bottomRight: Radius.circular(18),
+              ),
+              boxShadow: [
                 BoxShadow(
                   color: Colors.black12,
                   blurRadius: 10,
@@ -224,135 +295,138 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ],
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (replyMessage != null)
-                  Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.all(10),
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(.08),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 4,
-                          height: 40,
-                          color: Colors.blue,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                replySender!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                              Text(
-                                replyMessage!,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              replyMessage = null;
-                              replySender = null;
-                            });
-                          },
-                          icon: const Icon(Icons.close),
-                        ),
-                      ],
-                    ),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              if (replyMessage != null)
+                Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(.08),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-
-                // TextField here...
-
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: messageController,
-                        focusNode: _focusNode,
-                        onTap: () {
-                          Future.delayed(const Duration(milliseconds: 250), () {
-                            _scrollToBottom();
-                          });
-                        },
-                        onChanged: (value) async {
-                          if (value.isNotEmpty && !_isTyping) {
-                            setState(() => _isTyping = true);
-
-                            await _chatService.setTyping(
-                              otherUserId: widget.otherUser["uid"],
-                              isTyping: true,
-                            );
-                          }
-
-                          if (value.isEmpty && _isTyping) {
-                            setState(() => _isTyping = false);
-
-                            await _chatService.setTyping(
-                              otherUserId: widget.otherUser["uid"],
-                              isTyping: false,
-                            );
-                          }
-                        },
-                        decoration: InputDecoration(
-                          hintText: "Type a message...",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(25),
-                          ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 4,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    CircleAvatar(
-                      radius: 24,
-                      backgroundColor: Colors.blue,
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.send,
-                          color: Colors.white,
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Replying to",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.blue,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              replyMessage?["text"]?.toString() ?? "",
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
                         ),
-                        onPressed: () async {
-                          await _chatService.sendMessage(
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () {
+                          setState(() {
+                            replyMessage = null;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+
+              // Message input field கீழே வரும்
+
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: messageController,
+                      focusNode: _focusNode,
+                      onTap: () {
+                        Future.delayed(const Duration(milliseconds: 250), () {
+                          _scrollToBottom();
+                        });
+                      },
+                      onChanged: (value) async {
+                        if (value.isNotEmpty && !_isTyping) {
+                          setState(() => _isTyping = true);
+
+                          await _chatService.setTyping(
                             otherUserId: widget.otherUser["uid"],
-                            text: messageController.text,
-                            replyToMessage: replyMessage,
-                            replyToSender: replySender,
+                            isTyping: true,
                           );
-                          _isTyping = false;
+                        }
+
+                        if (value.isEmpty && _isTyping) {
+                          setState(() => _isTyping = false);
 
                           await _chatService.setTyping(
                             otherUserId: widget.otherUser["uid"],
                             isTyping: false,
                           );
-
-                          messageController.clear();
-
-                          setState(() {
-                            replyMessage = null;
-                            replySender = null;
-                            _isTyping = false;
-                          });
-                        },
+                        }
+                      },
+                      decoration: InputDecoration(
+                        hintText: "Type a message...",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
                       ),
                     ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                  const SizedBox(width: 10),
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: Colors.blue,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.send,
+                        color: Colors.white,
+                      ),
+                      onPressed: () async {
+                        await _chatService.sendMessage(
+                          otherUserId: widget.otherUser["uid"],
+                          text: messageController.text,
+                          replyToMessage: replyMessage,
+                          replyToSender: replySender,
+                        );
+                        _isTyping = false;
+
+                        await _chatService.setTyping(
+                          otherUserId: widget.otherUser["uid"],
+                          isTyping: false,
+                        );
+
+                        messageController.clear();
+
+                        setState(() {
+                          replyMessage = null;
+                          replySender = null;
+                          _isTyping = false;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ]),
           ),
         ),
       ),

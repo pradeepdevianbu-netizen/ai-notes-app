@@ -45,7 +45,7 @@ class ChatService {
   Future<void> sendMessage({
     required String otherUserId,
     required String text,
-    String? replyToMessage,
+    Map<String, dynamic>? replyToMessage,
     String? replyToSender,
   }) async {
     if (text.trim().isEmpty) return;
