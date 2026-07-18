@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:first_app/screens/chat/chat_screen.dart';
+import 'package:first_app/screens/chat/widget/chat_card.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class MessagesScreen extends StatelessWidget {
   const MessagesScreen({super.key});
@@ -11,152 +12,137 @@ class MessagesScreen extends StatelessWidget {
     final currentUid = FirebaseAuth.instance.currentUser!.uid;
 
     return Scaffold(
+      backgroundColor: const Color(0xffF5F7FB),
+
       appBar: AppBar(
-        title: const Text("Messages"),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        centerTitle: false,
+        title: const Text(
+          "Messages",
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(
+              Icons.search_rounded,
+              color: Colors.black87,
+            ),
+          ),
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(
+              Icons.more_vert,
+              color: Colors.black87,
+            ),
+          ),
+        ],
       ),
+
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection("chats")
             .where("participants", arrayContains: currentUid)
-            .orderBy("lastMessageTime", descending: true)
             .snapshots(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
 
-          final chats = snapshot.data!.docs;
-
-          if (chats.isEmpty) {
-            return const Center(
-              child: Text("No conversations yet"),
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(snapshot.error.toString()),
             );
           }
 
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(
+              child: Text(
+                "No conversations yet",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            );
+          }
+
+          final chats = snapshot.data!.docs;
+
+          chats.sort((a, b) {
+            final ta =
+                (a["lastMessageTime"] as Timestamp?)?.toDate() ??
+                    DateTime(2000);
+
+            final tb =
+                (b["lastMessageTime"] as Timestamp?)?.toDate() ??
+                    DateTime(2000);
+
+            return tb.compareTo(ta);
+          });
+
           return ListView.builder(
-              itemCount: chats.length,
-              itemBuilder: (context, index) {
-                final chat = chats[index];
+            padding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 12,
+            ),
+            itemCount: chats.length,
+            itemBuilder: (context, index) {
+              final chat =
+                  chats[index].data() as Map<String, dynamic>;
 
-                final participants = List<String>.from(chat["participants"]);
+              final participants =
+                  List<String>.from(chat["participants"]);
 
-                final otherUid =
-                    participants.firstWhere((e) => e != currentUid);
+              final otherUid = participants.firstWhere(
+                (e) => e != currentUid,
+              );
 
-                return FutureBuilder<DocumentSnapshot>(
-                    future: FirebaseFirestore.instance
-                        .collection("users")
-                        .doc(otherUid)
-                        .get(),
-                    builder: (context, userSnap) {
-                      if (!userSnap.hasData) {
-                        return const SizedBox();
-                      }
+              return FutureBuilder<DocumentSnapshot>(
+                future: FirebaseFirestore.instance
+                    .collection("users")
+                    .doc(otherUid)
+                    .get(),
+                builder: (context, userSnap) {
+                  if (!userSnap.hasData ||
+                      !userSnap.data!.exists) {
+                    return const SizedBox();
+                  }
 
-                      final user =
-                          userSnap.data!.data() as Map<String, dynamic>;
+                  final user = userSnap.data!.data()
+                      as Map<String, dynamic>;
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(16),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ChatScreen(
-                                  otherUser: user,
-                                ),
-                              ),
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 28,
-                                  backgroundColor: Colors.blue.shade100,
-                                  child: Text(
-                                    user["name"][0].toUpperCase(),
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.blue,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        user["name"],
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        chat["lastMessage"] ?? "",
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          color: Colors.grey.shade700,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      chat["lastMessageTime"] != null
-                                          ? TimeOfDay.fromDateTime(
-                                              (chat["lastMessageTime"]
-                                                      as Timestamp)
-                                                  .toDate(),
-                                            ).format(context)
-                                          : "",
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey.shade600,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    const Icon(
-                                      Icons.chevron_right,
-                                      color: Colors.grey,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    });
-              });
+                  final name = user["name"] ?? "Unknown";
+
+                  final lastMessage =
+                      chat["lastMessage"] ?? "";
+
+                  final Timestamp? ts =
+                      chat["lastMessageTime"];
+
+                  final time = ts == null
+                      ? ""
+                      : DateFormat("hh:mm a")
+                          .format(ts.toDate());
+
+                  return ChatCard(
+                    user: user,
+                    name: name,
+                    lastMessage: lastMessage,
+                    time: time,
+                  );
+                },
+              );
+            },
+          );
         },
       ),
     );

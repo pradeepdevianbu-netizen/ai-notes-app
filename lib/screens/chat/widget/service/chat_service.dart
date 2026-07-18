@@ -87,6 +87,7 @@ class ChatService {
     });
 
     await batch.commit();
+    print("Message Sent Successfully");
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getMessages(
