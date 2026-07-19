@@ -36,11 +36,11 @@ class ChatCard extends StatelessWidget {
           },
           child: Ink(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: const Color(0xFF1E293B),
               borderRadius: BorderRadius.circular(22),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(.05),
+                  color: Colors.black.withOpacity(.15),
                   blurRadius: 18,
                   spreadRadius: 1,
                   offset: const Offset(0, 8),
@@ -71,25 +71,21 @@ class ChatCard extends StatelessWidget {
                         child: CircleAvatar(
                           radius: 30,
                           backgroundColor: Colors.white,
-                          backgroundImage:
-                              (user["photoUrl"] != null &&
-                                      user["photoUrl"] != "")
-                                  ? NetworkImage(user["photoUrl"])
-                                  : null,
-                          child:
-                              (user["photoUrl"] == null ||
-                                      user["photoUrl"] == "")
-                                  ? Text(
-                                      name.isNotEmpty
-                                          ? name[0].toUpperCase()
-                                          : "?",
-                                      style: const TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
-                                      ),
-                                    )
-                                  : null,
+                          backgroundImage: (user["photoUrl"] != null &&
+                                  user["photoUrl"] != "")
+                              ? NetworkImage(user["photoUrl"])
+                              : null,
+                          child: (user["photoUrl"] == null ||
+                                  user["photoUrl"] == "")
+                              ? Text(
+                                  name.isNotEmpty ? name[0].toUpperCase() : "?",
+                                  style: const TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
+                                )
+                              : null,
                         ),
                       ),
 
@@ -118,19 +114,17 @@ class ChatCard extends StatelessWidget {
 
                   Expanded(
                     child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           name,
                           style: const TextStyle(
-                            fontSize: 17,
+                            fontSize: 16,
                             fontWeight: FontWeight.w700,
+                            color: Colors.white,
                           ),
                         ),
-
                         const SizedBox(height: 6),
-
                         user["typing"] == true
                             ? const Text(
                                 "Typing...",
@@ -155,8 +149,7 @@ class ChatCard extends StatelessWidget {
                   const SizedBox(width: 10),
 
                   Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
                         time,
@@ -166,9 +159,7 @@ class ChatCard extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-
                       const SizedBox(height: 10),
-
                       Container(
                         width: 24,
                         height: 24,

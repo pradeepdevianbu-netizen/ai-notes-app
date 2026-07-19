@@ -13,9 +13,7 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen>
-    with WidgetsBindingObserver {
-
+class _MainScreenState extends State<MainScreen> {
   final PresenceService _presence = PresenceService();
 
   int selectedIndex = 0;
@@ -31,33 +29,7 @@ class _MainScreenState extends State<MainScreen>
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addObserver(this);
-
     _presence.setOnline();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    switch (state) {
-      case AppLifecycleState.resumed:
-        _presence.setOnline();
-        break;
-
-      case AppLifecycleState.inactive:
-      case AppLifecycleState.paused:
-      case AppLifecycleState.detached:
-      case AppLifecycleState.hidden:
-        _presence.setOffline();
-        break;
-    }
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _presence.setOffline();
-    super.dispose();
   }
 
   Widget _navItem({
@@ -81,9 +53,7 @@ class _MainScreenState extends State<MainScreen>
           vertical: 10,
         ),
         decoration: BoxDecoration(
-          color: selected
-              ? const Color(0xFF5B8CFF)
-              : Colors.transparent,
+          color: selected ? const Color(0xFF5B8CFF) : Colors.transparent,
           borderRadius: BorderRadius.circular(18),
         ),
         child: Column(
@@ -103,9 +73,7 @@ class _MainScreenState extends State<MainScreen>
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 11,
-                fontWeight: selected
-                    ? FontWeight.bold
-                    : FontWeight.w500,
+                fontWeight: selected ? FontWeight.bold : FontWeight.w500,
               ),
             ),
           ],
@@ -167,9 +135,7 @@ class _MainScreenState extends State<MainScreen>
         duration: const Duration(milliseconds: 250),
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
-          color: selected
-              ? const Color(0xFF5B8CFF)
-              : Colors.transparent,
+          color: selected ? const Color(0xFF5B8CFF) : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: const CircleAvatar(
