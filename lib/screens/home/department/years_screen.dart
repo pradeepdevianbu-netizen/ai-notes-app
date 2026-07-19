@@ -37,7 +37,7 @@ class YearsScreen extends StatelessWidget {
 
       appBar: CustomAppBar(
         title: (departmentName),
-        subtitle: "4 years Available",
+        subtitle: "4 years  Available",
       ),
 
       body: ListView.builder(

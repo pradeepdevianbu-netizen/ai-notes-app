@@ -91,7 +91,7 @@ class ConnectionScreen extends StatelessWidget {
             onTap: () {},
           ),
 
-          const SizedBox(height: 18),
+          const SizedBox(height: 17),
 
           /// Trending Students
           _buildCard(

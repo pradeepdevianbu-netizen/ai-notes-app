@@ -31,7 +31,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           Text(
             subtitle ?? "Connect • Chat • Grow",
             style: const TextStyle(
-              fontSize: 13,
+              fontSize: 14,
               color: Colors.white70,
               fontWeight: FontWeight.w500,
             ),

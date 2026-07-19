@@ -50,7 +50,7 @@ class _StudentCardState extends State<StudentCard> {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(.06),
-            blurRadius: 18,
+            blurRadius: 17,
             offset: const Offset(0, 8),
           ),
         ],
