@@ -156,6 +156,13 @@ class _ChatScreenState extends State<ChatScreen> {
                     );
                   }
                 });
+                void _scrollToBottom() {
+                  if (_scrollController.hasClients) {
+                    _scrollController.jumpTo(
+                      _scrollController.position.maxScrollExtent,
+                    );
+                  }
+                }
 
                 final docs = snapshot.data!.docs;
 
@@ -163,7 +170,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
                 return ListView.builder(
                   controller: _scrollController,
-                  reverse: false,
+                  reverse: true,
                   padding: const EdgeInsets.only(bottom: 80),
                   keyboardDismissBehavior:
                       ScrollViewKeyboardDismissBehavior.onDrag,
