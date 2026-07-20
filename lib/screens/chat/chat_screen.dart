@@ -351,7 +351,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
 
-              // Message input field கீழே வரும்
+              // Message input field
 
               Row(
                 children: [
@@ -365,8 +365,8 @@ class _ChatScreenState extends State<ChatScreen> {
                         });
                       },
                       onChanged: (value) async {
-                        if (value.isNotEmpty && !_isTyping) {
-                          setState(() => _isTyping = true);
+                        if (value.trim().isNotEmpty && !_isTyping) {
+                          _isTyping = true;
 
                           await _chatService.setTyping(
                             otherUserId: widget.otherUser["uid"],
@@ -374,8 +374,8 @@ class _ChatScreenState extends State<ChatScreen> {
                           );
                         }
 
-                        if (value.isEmpty && _isTyping) {
-                          setState(() => _isTyping = false);
+                        if (value.trim().isEmpty && _isTyping) {
+                          _isTyping = false;
 
                           await _chatService.setTyping(
                             otherUserId: widget.otherUser["uid"],

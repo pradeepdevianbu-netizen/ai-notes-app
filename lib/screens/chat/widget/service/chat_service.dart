@@ -27,21 +27,22 @@ class ChatService {
     }, SetOptions(merge: true));
   }
 
-  Stream<bool> getTypingStatus(String otherUserId) {
-    final currentUid = _auth.currentUser!.uid;
-    final chatId = getChatId(otherUserId);
+Stream<bool> getTypingStatus(String otherUserId) {
+  final chatId = getChatId(otherUserId);
 
-    return _firestore.collection("chats").doc(chatId).snapshots().map((doc) {
-      if (!doc.exists) return false;
+  return _firestore.collection("chats").doc(chatId).snapshots().map((doc) {
+    if (!doc.exists) return false;
 
-      final data = doc.data() as Map<String, dynamic>;
+    final data = doc.data()!;
+    final typing = data["typing"] ?? {};
 
-      final typing = data["typing"] ?? {};
+    print("Typing map: $typing");
+    print("Other user: $otherUserId");
+    print("Status: ${typing[otherUserId]}");
 
-      return typing[otherUserId] ?? false;
-    });
-  }
-
+    return typing[otherUserId] ?? false;
+  });
+}
   Future<void> sendMessage({
     required String otherUserId,
     required String text,
