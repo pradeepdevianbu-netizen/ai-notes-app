@@ -13,34 +13,36 @@ class ChatService {
     return ids.join("_");
   }
 
-  Future<void> setTyping({
-    required String otherUserId,
-    required bool isTyping,
-    String? replyToMessage,
-    String? replyToSender,
-  }) async {
-    final currentUid = _auth.currentUser!.uid;
-    final chatId = getChatId(otherUserId);
+Future<void> setTyping({
+  required String otherUserId,
+  required bool isTyping,
+}) async {
+  final currentUid = _auth.currentUser!.uid;
+  final chatId = getChatId(otherUserId);
 
-    await _firestore.collection("chats").doc(chatId).set({
-      "typing.$currentUid": isTyping,
-    }, SetOptions(merge: true));
-  }
+  final docRef = _firestore.collection("chats").doc(chatId);
 
+  await docRef.set({
+    "typing.$currentUid": isTyping,
+  }, SetOptions(merge: true));
+
+  final doc = await docRef.get();
+  print("Document Data: ${doc.data()}");
+}
 Stream<bool> getTypingStatus(String otherUserId) {
   final chatId = getChatId(otherUserId);
 
-  return _firestore.collection("chats").doc(chatId).snapshots().map((doc) {
+  return _firestore
+      .collection("chats")
+      .doc(chatId)
+      .snapshots()
+      .map((doc) {
     if (!doc.exists) return false;
 
     final data = doc.data()!;
-    final typing = data["typing"] ?? {};
 
-    print("Typing map: $typing");
-    print("Other user: $otherUserId");
-    print("Status: ${typing[otherUserId]}");
-
-    return typing[otherUserId] ?? false;
+    // Read the flat Firestore field
+    return data["typing.$otherUserId"] ?? false;
   });
 }
   Future<void> sendMessage({
@@ -100,7 +102,7 @@ Stream<bool> getTypingStatus(String otherUserId) {
         .collection("chats")
         .doc(chatId)
         .collection("messages")
-        .orderBy("timestamp", descending: false)
+        .orderBy("timestamp", descending: true)
         .snapshots();
   }
 

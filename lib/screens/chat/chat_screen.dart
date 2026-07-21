@@ -72,8 +72,8 @@ class _ChatScreenState extends State<ChatScreen> {
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
+        0.0,
+        duration: const Duration(milliseconds: 250),
         curve: Curves.easeOut,
       );
     }
@@ -146,22 +146,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
-                }
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (_scrollController.hasClients) {
-                    _scrollController.animateTo(
-                      _scrollController.position.maxScrollExtent,
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeOut,
-                    );
-                  }
-                });
-                void _scrollToBottom() {
-                  if (_scrollController.hasClients) {
-                    _scrollController.jumpTo(
-                      _scrollController.position.maxScrollExtent,
-                    );
-                  }
                 }
 
                 final docs = snapshot.data!.docs;
@@ -367,7 +351,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       controller: messageController,
                       focusNode: _focusNode,
                       onTap: () {
-                        Future.delayed(const Duration(milliseconds: 250), () {
+                        Future.delayed(const Duration(milliseconds: 200), () {
                           _scrollToBottom();
                         });
                       },
