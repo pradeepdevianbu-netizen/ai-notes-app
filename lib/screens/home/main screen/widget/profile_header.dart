@@ -1,22 +1,23 @@
+import 'package:first_app/constants/app_colors.dart';
+import 'package:first_app/screens/home/main%20screen/widget/profile_model.dart';
 import 'package:flutter/material.dart';
 
 class ProfileHeader extends StatelessWidget {
-  final Map<String, dynamic> user;
-  final VoidCallback onEdit;
+  final ProfileModel profile;
+  final VoidCallback onEditPhoto;
 
   const ProfileHeader({
     super.key,
-    required this.user,
-    required this.onEdit,
+    required this.profile,
+    required this.onEditPhoto,
   });
 
   @override
   Widget build(BuildContext context) {
-    final image = user["profileImage"] ?? "";
-
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(25),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
@@ -29,38 +30,73 @@ class ProfileHeader extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.withOpacity(.25),
-            blurRadius: 18,
-            offset: const Offset(0, 10),
+            color: AppColors.primary.withOpacity(.30),
+            blurRadius: 20,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
       child: Column(
         children: [
 
-          CircleAvatar(
-            radius: 55,
-            backgroundColor: Colors.white,
-            child: CircleAvatar(
-              radius: 51,
-              backgroundColor: Colors.grey.shade300,
-              backgroundImage: image.isNotEmpty
-                  ? NetworkImage(image)
-                  : null,
-              child: image.isEmpty
-                  ? const Icon(
-                      Icons.person,
-                      size: 55,
-                      color: Colors.grey,
-                    )
-                  : null,
-            ),
+          /// Avatar
+          Stack(
+            children: [
+
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: CircleAvatar(
+                  radius: 58,
+                  backgroundColor: Colors.grey.shade200,
+                  backgroundImage: profile.photoUrl.isNotEmpty
+                      ? NetworkImage(profile.photoUrl)
+                      : null,
+                  child: profile.photoUrl.isEmpty
+                      ? const Icon(
+                          Icons.person,
+                          size: 60,
+                          color: Colors.grey,
+                        )
+                      : null,
+                ),
+              ),
+
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: GestureDetector(
+                  onTap: onEditPhoto,
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.blue,
+                        width: 2,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.camera_alt,
+                      color: Colors.blue,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ),
+
+            ],
           ),
 
           const SizedBox(height: 18),
 
+          /// Name
           Text(
-            user["name"] ?? "",
+            profile.name,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 26,
@@ -68,35 +104,37 @@ class ProfileHeader extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
 
+          /// Headline
           Text(
-            "${user["department"] ?? ""} • ${user["year"] ?? ""}",
+            profile.headline,
+            textAlign: TextAlign.center,
             style: const TextStyle(
               color: Colors.white70,
-              fontSize: 15,
+              fontSize: 16,
             ),
           ),
 
           const SizedBox(height: 18),
 
-          ElevatedButton.icon(
-            onPressed: onEdit,
-            icon: const Icon(Icons.edit),
-            label: const Text("Edit Profile"),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: const Color(0xFF2563EB),
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 22,
-                vertical: 13,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 18,
+              vertical: 8,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(.18),
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: Text(
+              "${profile.department} • ${profile.year}",
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
               ),
             ),
-          )
+          ),
         ],
       ),
     );

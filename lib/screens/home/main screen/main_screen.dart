@@ -2,7 +2,8 @@ import 'package:first_app/screens/home/home_screen.dart';
 import 'package:first_app/screens/home/main screen/connection_screen.dart';
 import 'package:first_app/screens/home/main screen/message_screen.dart';
 import 'package:first_app/screens/home/main screen/notification_screen.dart';
-import 'package:first_app/screens/home/main screen/profile_screen.dart';
+import 'package:first_app/screens/home/main%20screen/widget/profile/profile_screen.dart';
+
 import 'package:first_app/services/presence_service.dart';
 import 'package:flutter/material.dart';
 
