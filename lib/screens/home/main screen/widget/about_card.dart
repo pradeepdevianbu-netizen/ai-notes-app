@@ -24,7 +24,7 @@ class AboutCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(.04),
-            blurRadius: 16,
+            blurRadius: 17,
             offset: const Offset(0, 8),
           ),
         ],

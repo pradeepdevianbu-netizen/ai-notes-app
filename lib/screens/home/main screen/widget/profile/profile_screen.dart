@@ -7,8 +7,6 @@ import 'package:first_app/screens/home/main%20screen/widget/social_card.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/constants/app_colors.dart';
 
-
-
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -35,92 +33,83 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: AppColors.background,
-        body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-
-  ProfileHeader(
-    profile: profile,
-    onEditPhoto: () {},
-  ),
-
-  const SizedBox(height: 20),
-
-  Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 16),
-    child: AboutCard(
-      about: profile.about,
-    ),
-  ),
-
-  const SizedBox(height: 18),
-
-  Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 16),
-    child: DeveloperCard(
-      skills: const [
-        "Flutter",
-        "Firebase",
-        "Dart",
-        "Git",
-        "REST API",
-        "UI Design",
-        "Figma",
-        "AI",
-      ],
-    ),
-  ),
-
-  const SizedBox(height: 18),
-
-  Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 16),
-    child: SocialCard(
-      github: profile.github,
-      linkedin: profile.linkedin,
-      portfolio: profile.portfolio,
-    ),
-  ),
-
-  const SizedBox(height: 18),
-
-  Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 16),
-    child: ContactCard(
-      email: profile.email,
-      phone: profile.phone,
-      college: "ABC Engineering College",
-      department: profile.department,
-      year: profile.year,
-    ),
-  ),
-
-  const SizedBox(height: 20),
-
-  Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 20),
-    child: SizedBox(
-      width: double.infinity,
-      height: 55,
-      child: ElevatedButton.icon(
-        onPressed: () {},
-        icon: const Icon(Icons.edit, color: Colors.white),
-        label: const Text(
-          "Edit Profile",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 17,
-            fontWeight: FontWeight.bold,
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              ProfileHeader(
+                profile: profile,
+                onEditPhoto: () {},
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: AboutCard(
+                  about: profile.about,
+                ),
+              ),
+              const SizedBox(height: 18),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: DeveloperCard(
+                  skills: [
+                    "Flutter",
+                    "Firebase",
+                    "Dart",
+                    "Git",
+                    "REST API",
+                    "UI Design",
+                    "Figma",
+                    "AI",
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SocialCard(
+                  github: profile.github,
+                  linkedin: profile.linkedin,
+                  portfolio: profile.portfolio,
+                ),
+              ),
+              const SizedBox(height: 18),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ContactCard(
+                  email: profile.email,
+                  phone: profile.phone,
+                  college: "ABC Engineering College",
+                  department: profile.department,
+                  year: profile.year,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 55,
+                  child: ElevatedButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.edit, color: Colors.white),
+                    label: const Text(
+                      "Edit Profile",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 30),
+            ],
           ),
         ),
       ),
-    ),
-  ),
-
-  const SizedBox(height: 30),
-
-],
-            ),),),);}}
-            
+    );
+  }
+}

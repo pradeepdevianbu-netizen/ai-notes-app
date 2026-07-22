@@ -14,7 +14,6 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-
   final _nameController = TextEditingController();
   final _headlineController = TextEditingController();
   final _aboutController = TextEditingController();
@@ -52,19 +51,31 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     required String title,
     required TextEditingController controller,
     int maxLines = 1,
-    bool enabled = true,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title),
-          const SizedBox(height: 8),
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+            ),
+          ),
+          const SizedBox(height: 9),
           TextField(
             controller: controller,
-            enabled: enabled,
             maxLines: maxLines,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.grey.shade100,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(18),
+                borderSide: BorderSide.none,
+              ),
+            ),
           ),
         ],
       ),
