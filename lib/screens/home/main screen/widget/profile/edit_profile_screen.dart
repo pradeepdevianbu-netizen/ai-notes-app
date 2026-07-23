@@ -1,5 +1,8 @@
+import 'package:first_app/constants/app_colors.dart';
 import 'package:first_app/screens/home/main%20screen/widget/profile_model.dart';
 import 'package:flutter/material.dart';
+
+
 
 class EditProfileScreen extends StatefulWidget {
   final ProfileModel profile;
@@ -64,7 +67,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               fontSize: 15,
             ),
           ),
-          const SizedBox(height: 9),
+          const SizedBox(height: 8),
           TextField(
             controller: controller,
             maxLines: maxLines,
@@ -82,14 +85,124 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Future<void> saveProfile() async {
-    // Firestore update code
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(),
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          "Edit Profile",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                const CircleAvatar(
+                  radius: 55,
+                  backgroundColor: Colors.white,
+                  child: Icon(
+                    Icons.person,
+                    size: 60,
+                    color: Colors.grey,
+                  ),
+                ),
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: CircleAvatar(
+                    radius: 18,
+                    backgroundColor: AppColors.primary,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: const Icon(
+                        Icons.camera_alt,
+                        size: 18,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {},
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 30),
+
+            buildField(
+              title: "Full Name",
+              controller: _nameController,
+            ),
+
+            buildField(
+              title: "Headline",
+              controller: _headlineController,
+            ),
+
+            buildField(
+              title: "About",
+              controller: _aboutController,
+              maxLines: 4,
+            ),
+
+            buildField(
+              title: "Phone Number",
+              controller: _phoneController,
+            ),
+
+            buildField(
+              title: "GitHub",
+              controller: _githubController,
+            ),
+
+            buildField(
+              title: "LinkedIn",
+              controller: _linkedinController,
+            ),
+
+            buildField(
+              title: "Portfolio",
+              controller: _portfolioController,
+            ),
+
+            const SizedBox(height: 20),
+
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                ),
+                child: const Text(
+                  "Save Changes",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
