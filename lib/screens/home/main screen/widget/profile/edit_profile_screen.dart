@@ -2,8 +2,6 @@ import 'package:first_app/constants/app_colors.dart';
 import 'package:first_app/screens/home/main%20screen/widget/profile_model.dart';
 import 'package:flutter/material.dart';
 
-
-
 class EditProfileScreen extends StatefulWidget {
   final ProfileModel profile;
 
@@ -136,53 +134,57 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
               ],
             ),
-
             const SizedBox(height: 30),
-
             buildField(
               title: "Full Name",
               controller: _nameController,
             ),
-
             buildField(
               title: "Headline",
               controller: _headlineController,
             ),
-
             buildField(
               title: "About",
               controller: _aboutController,
               maxLines: 4,
             ),
-
             buildField(
               title: "Phone Number",
               controller: _phoneController,
             ),
-
             buildField(
               title: "GitHub",
               controller: _githubController,
             ),
-
             buildField(
               title: "LinkedIn",
               controller: _linkedinController,
             ),
-
             buildField(
               title: "Portfolio",
               controller: _portfolioController,
             ),
-
             const SizedBox(height: 20),
-
             SizedBox(
               width: double.infinity,
               height: 55,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  final updatedProfile = ProfileModel(
+                    name: _nameController.text,
+                    headline: _headlineController.text,
+                    about: _aboutController.text,
+                    email: widget.profile.email,
+                    phone: _phoneController.text,
+                    department: widget.profile.department,
+                    year: widget.profile.year,
+                    github: _githubController.text,
+                    linkedin: _linkedinController.text,
+                    portfolio: _portfolioController.text,
+                    photoUrl: widget.profile.photoUrl,
+                  );
+
+                  Navigator.pop(context, updatedProfile);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,

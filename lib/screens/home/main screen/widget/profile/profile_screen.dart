@@ -1,11 +1,12 @@
+import 'package:first_app/constants/app_colors.dart';
 import 'package:first_app/screens/home/main%20screen/widget/about_card.dart';
 import 'package:first_app/screens/home/main%20screen/widget/contact_card.dart';
 import 'package:first_app/screens/home/main%20screen/widget/developer_card.dart';
+import 'package:first_app/screens/home/main%20screen/widget/profile/edit_profile_screen.dart';
 import 'package:first_app/screens/home/main%20screen/widget/profile_header.dart';
 import 'package:first_app/screens/home/main%20screen/widget/profile_model.dart';
 import 'package:first_app/screens/home/main%20screen/widget/social_card.dart';
 import 'package:flutter/material.dart';
-import 'package:first_app/constants/app_colors.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -42,14 +43,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 profile: profile,
                 onEditPhoto: () {},
               ),
+
               const SizedBox(height: 20),
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: AboutCard(
                   about: profile.about,
                 ),
               ),
+
               const SizedBox(height: 18),
+
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: DeveloperCard(
@@ -65,7 +70,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
               ),
+
               const SizedBox(height: 18),
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: SocialCard(
@@ -74,7 +81,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   portfolio: profile.portfolio,
                 ),
               ),
+
               const SizedBox(height: 18),
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: ContactCard(
@@ -85,15 +94,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   year: profile.year,
                 ),
               ),
-              const SizedBox(height: 20),
+
+              const SizedBox(height: 25),
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: SizedBox(
                   width: double.infinity,
                   height: 55,
                   child: ElevatedButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.edit, color: Colors.white),
+                    onPressed: () async {
+                      final result = await Navigator.push<ProfileModel>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => EditProfileScreen(
+                            profile: profile,
+                          ),
+                        ),
+                      );
+
+                      if (result != null) {
+                        setState(() {
+                          profile = result;
+                        });
+                      }
+                    },
+                    icon: const Icon(
+                      Icons.edit,
+                      color: Colors.white,
+                    ),
                     label: const Text(
                       "Edit Profile",
                       style: TextStyle(
@@ -102,9 +131,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                    ),
                   ),
                 ),
               ),
+
               const SizedBox(height: 30),
             ],
           ),
