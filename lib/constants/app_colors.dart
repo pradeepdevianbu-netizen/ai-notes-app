@@ -1,29 +1,31 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Brand
-  static const Color primary = Color(0xFF2563EB);
-  static const Color secondary = Color(0xFF3B82F6);
+  // Primary
+  static const Color primary = Color(0xFF25D366);
+  static const Color secondary = Color(0xFF128C7E);
 
   // Background
-  static const Color background = Color(0xFFF5F7FB);
+  static const Color background = Color(0xFF0B141A);
 
-  // Surface
-  static const Color surface = Colors.white;
+  // AppBar
+  static const Color appBar = Color(0xFF111B21);
+
+  // Cards / TextFields
+  static const Color surface = Color(0xFF202C33);
 
   // Text
-  static const Color textPrimary = Color(0xFF1E293B);
-  static const Color textSecondary = Color(0xFF64748B);
+  static const Color textPrimary = Colors.white;
+  static const Color textSecondary = Color(0xFF8696A0);
 
-  // Border
-  static const Color border = Color(0xFFE2E8F0);
+  // Borders
+  static const Color border = Color(0xFF2A3942);
 
   // Status
-  static const Color success = Color(0xFF22C55E);
+  static const Color success = Color(0xFF25D366);
   static const Color warning = Color(0xFFF59E0B);
-  static const Color error = Color(0xFFEF4444);
+  static const Color error = Color(0xFFE5484D);
 
   // Shadow
-  static const Color cardShadow = Color(0x14000000);
+  static const Color cardShadow = Colors.black26;
 }
