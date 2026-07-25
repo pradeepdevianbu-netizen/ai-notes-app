@@ -34,7 +34,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               color: AppColors.textSecondary,
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -43,7 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 6),
           Text(
             value.isEmpty ? "-" : value,
-            style: TextStyle(
+            style: const TextStyle(
               color: AppColors.textPrimary,
               fontSize: 16,
               fontWeight: FontWeight.w500,
@@ -66,11 +66,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.border),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: AppColors.cardShadow,
             blurRadius: 10,
-            offset: const Offset(0, 4),
+            offset: Offset(0, 4),
           ),
         ],
       ),
@@ -79,7 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               color: AppColors.textPrimary,
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -140,7 +140,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             Text(
               profile.name,
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -151,7 +151,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             Text(
               profile.headline,
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 15,
               ),

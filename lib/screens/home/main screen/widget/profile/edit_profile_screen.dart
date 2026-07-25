@@ -61,7 +61,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         children: [
           Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               color: AppColors.textPrimary,
               fontWeight: FontWeight.w600,
               fontSize: 15,
@@ -71,13 +71,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           TextField(
             controller: controller,
             maxLines: maxLines,
-            style: TextStyle(
+            style: const TextStyle(
               color: AppColors.textPrimary,
             ),
             decoration: InputDecoration(
               filled: true,
               fillColor: AppColors.surface,
-              hintStyle: TextStyle(
+              hintStyle: const TextStyle(
                 color: AppColors.textSecondary,
               ),
               contentPadding: const EdgeInsets.symmetric(
@@ -86,13 +86,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(18),
-                borderSide: BorderSide(
+                borderSide: const BorderSide(
                   color: AppColors.border,
                 ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(18),
-                borderSide: BorderSide(
+                borderSide: const BorderSide(
                   color: AppColors.primary,
                   width: 1.5,
                 ),
@@ -118,11 +118,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         border: Border.all(
           color: AppColors.border,
         ),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: AppColors.cardShadow,
             blurRadius: 12,
-            offset: const Offset(0, 5),
+            offset: Offset(0, 5),
           ),
         ],
       ),
@@ -131,7 +131,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         children: [
           Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               color: AppColors.textPrimary,
               fontSize: 18,
               fontWeight: FontWeight.bold,
