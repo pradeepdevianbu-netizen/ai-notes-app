@@ -229,19 +229,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
               ],
             ),
-            buildSection(
-              title: "Academic Information",
-              children: [
-                buildField(
-                  title: "Department",
-                  controller: _departmentController,
-                ),
-                buildField(
-                  title: "Year",
-                  controller: _yearController,
-                ),
-              ],
-            ),
+           
             buildSection(
               title: "Social Links",
               children: [
@@ -259,15 +247,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
               ],
             ),
-            buildSection(
-              title: "Account",
-              children: [
-                buildField(
-                  title: "Email",
-                  controller: TextEditingController(text: widget.profile.email),
-                ),
-              ],
-            ),
+           
             const SizedBox(height: 10),
             SizedBox(
               width: double.infinity,

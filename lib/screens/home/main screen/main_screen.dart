@@ -1,7 +1,7 @@
 import 'package:first_app/screens/home/home_screen.dart';
 import 'package:first_app/screens/home/main screen/connection_screen.dart';
 import 'package:first_app/screens/home/main screen/message_screen.dart';
-import 'package:first_app/screens/home/main screen/notification_screen.dart';
+import 'package:first_app/screens/home/main%20screen/create_screen.dart';
 import 'package:first_app/screens/home/main%20screen/widget/profile/profile_screen.dart';
 
 import 'package:first_app/services/presence_service.dart';
@@ -22,8 +22,8 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> pages = const [
     HomeScreen(),
     ConnectionScreen(),
+    CreateScreen(),
     MessagesScreen(),
-    NotificationScreen(),
     ProfileScreen(),
   ];
 
@@ -181,17 +181,16 @@ class _MainScreenState extends State<MainScreen> {
                 icon: Icons.people_alt_rounded,
                 label: "Connect",
               ),
-              _badgeNavItem(
+              _navItem(
                 index: 2,
-                icon: Icons.chat_bubble_rounded,
-                badge: 3,
-                label: "Messages",
+                icon: Icons.add_circle_rounded,
+                label: "Create",
               ),
               _badgeNavItem(
                 index: 3,
-                icon: Icons.notifications_rounded,
-                badge: 8,
-                label: "Alerts",
+                icon: Icons.chat_bubble_rounded,
+                badge: 3,
+                label: "Messages",
               ),
               _profileNavItem(index: 4),
             ],
