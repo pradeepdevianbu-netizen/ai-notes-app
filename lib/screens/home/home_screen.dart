@@ -4,6 +4,7 @@ import 'package:first_app/screens/home/widgets/ai_assistant_card.dart';
 import 'package:first_app/screens/home/department/department_card.dart';
 import 'package:first_app/screens/home/widgets/home_app_bar.dart';
 import 'package:first_app/screens/home/widgets/home_search_bar.dart';
+import 'package:first_app/screens/home/widgets/post_feed.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -45,6 +46,9 @@ class HomeScreen extends StatelessWidget {
                     AIAssistantCard(),
                     SizedBox(height: 24),
                     Departmentcard(),
+                    SizedBox(height: 24),
+                    PostFeed(),
+                    SizedBox(height: 30),
                   ],
                 ),
               ),
