@@ -69,7 +69,7 @@ class ChatCard extends StatelessWidget {
                           ),
                         ),
                         child: CircleAvatar(
-                          radius: 30,
+                          radius: 28,
                           backgroundColor: Colors.white,
                           backgroundImage: (user["photoUrl"] != null &&
                                   user["photoUrl"] != "")
@@ -98,12 +98,18 @@ class ChatCard extends StatelessWidget {
                             width: 16,
                             height: 16,
                             decoration: BoxDecoration(
-                              color: Colors.green,
-                              shape: BoxShape.circle,
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(18),
                               border: Border.all(
-                                color: Colors.white,
-                                width: 2,
+                                color: const Color(0xFFE5E7EB),
                               ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.04),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -121,7 +127,7 @@ class ChatCard extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                            color: Color(0xFF111827),
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -137,8 +143,8 @@ class ChatCard extends StatelessWidget {
                                 lastMessage,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: Colors.grey,
+                                style: const TextStyle(
+                                  color: Color(0xFF9CA3AF),
                                   fontSize: 14,
                                 ),
                               ),
@@ -164,7 +170,7 @@ class ChatCard extends StatelessWidget {
                         width: 24,
                         height: 24,
                         decoration: const BoxDecoration(
-                          color: Colors.blue,
+                          color:  Color(0xFF25D366),
                           shape: BoxShape.circle,
                         ),
                         alignment: Alignment.center,
