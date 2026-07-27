@@ -1,3 +1,4 @@
+import 'package:first_app/constants/app_colors.dart';
 import 'package:first_app/screens/chat/chat_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -36,16 +37,11 @@ class ChatCard extends StatelessWidget {
           },
           child: Ink(
             decoration: BoxDecoration(
-              color: const Color(0xFF1E293B),
-              borderRadius: BorderRadius.circular(22),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(.15),
-                  blurRadius: 18,
-                  spreadRadius: 1,
-                  offset: const Offset(0, 8),
-                ),
-              ],
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: AppColors.border,
+              ),
             ),
             child: Padding(
               padding: const EdgeInsets.symmetric(
@@ -127,7 +123,7 @@ class ChatCard extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF111827),
+                        color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -170,7 +166,7 @@ class ChatCard extends StatelessWidget {
                         width: 24,
                         height: 24,
                         decoration: const BoxDecoration(
-                          color:  Color(0xFF25D366),
+                          color: Color(0xFF25D366),
                           shape: BoxShape.circle,
                         ),
                         alignment: Alignment.center,
