@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:first_app/constants/app_colors.dart';
 import 'package:first_app/screens/chat/widget/chat_card.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class MessagesScreen extends StatelessWidget {
   const MessagesScreen({super.key});
@@ -13,37 +13,39 @@ class MessagesScreen extends StatelessWidget {
     final currentUid = FirebaseAuth.instance.currentUser!.uid;
 
     return Scaffold(
-      backgroundColor: const Color(0xffF5F7FB),
+      backgroundColor: AppColors.background,
+
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF5F7FB),
+        backgroundColor: AppColors.appBar,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        titleSpacing: 16,
-        title: Text(
+        centerTitle: false,
+        title: const Text(
           "Messages",
-          style: GoogleFonts.inter(
-            fontSize: 22,
-            fontWeight: FontWeight.w700,
-            color: const Color(0xFF111827),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
         actions: [
           IconButton(
             onPressed: () {},
             icon: const Icon(
-              Icons.search,
-              color: Color(0xFF374151),
+              Icons.search_rounded,
+              color: Colors.white,
             ),
           ),
           IconButton(
             onPressed: () {},
             icon: const Icon(
               Icons.more_vert,
-              color: Color(0xFF374151),
+              color: Colors.white,
             ),
           ),
         ],
       ),
+
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection("chats")
@@ -69,6 +71,7 @@ class MessagesScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
                 ),
               ),
             );
@@ -77,25 +80,29 @@ class MessagesScreen extends StatelessWidget {
           final chats = snapshot.data!.docs;
 
           chats.sort((a, b) {
-            final ta = (a["lastMessageTime"] as Timestamp?)?.toDate() ??
-                DateTime(2000);
+            final ta =
+                (a["lastMessageTime"] as Timestamp?)?.toDate() ??
+                    DateTime(2000);
 
-            final tb = (b["lastMessageTime"] as Timestamp?)?.toDate() ??
-                DateTime(2000);
+            final tb =
+                (b["lastMessageTime"] as Timestamp?)?.toDate() ??
+                    DateTime(2000);
 
             return tb.compareTo(ta);
           });
 
           return ListView.builder(
             padding: const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 12,
+              horizontal: 16,
+              vertical: 16,
             ),
             itemCount: chats.length,
             itemBuilder: (context, index) {
-              final chat = chats[index].data() as Map<String, dynamic>;
+              final chat =
+                  chats[index].data() as Map<String, dynamic>;
 
-              final participants = List<String>.from(chat["participants"]);
+              final participants =
+                  List<String>.from(chat["participants"]);
 
               final otherUid = participants.firstWhere(
                 (e) => e != currentUid,
@@ -107,21 +114,26 @@ class MessagesScreen extends StatelessWidget {
                     .doc(otherUid)
                     .get(),
                 builder: (context, userSnap) {
-                  if (!userSnap.hasData || !userSnap.data!.exists) {
+                  if (!userSnap.hasData ||
+                      !userSnap.data!.exists) {
                     return const SizedBox();
                   }
 
-                  final user = userSnap.data!.data() as Map<String, dynamic>;
+                  final user =
+                      userSnap.data!.data() as Map<String, dynamic>;
 
                   final name = user["name"] ?? "Unknown";
 
-                  final lastMessage = chat["lastMessage"] ?? "";
+                  final lastMessage =
+                      chat["lastMessage"] ?? "";
 
-                  final Timestamp? ts = chat["lastMessageTime"];
+                  final Timestamp? ts =
+                      chat["lastMessageTime"];
 
                   final time = ts == null
                       ? ""
-                      : DateFormat("hh:mm a").format(ts.toDate());
+                      : DateFormat("hh:mm a")
+                          .format(ts.toDate());
 
                   return ChatCard(
                     user: user,
