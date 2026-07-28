@@ -59,20 +59,20 @@ class _ChatScreenState extends State<ChatScreen> {
       widget.otherUser["uid"],
     );
   }
-@override
-void dispose() {
-  _chatService.setTyping(
-    otherUserId: widget.otherUser["uid"],
-    isTyping: false,
-  );
 
-  messageController.dispose();
-  _scrollController.dispose();
-  _focusNode.dispose();
+  @override
+  void dispose() {
+    _chatService.setTyping(
+      otherUserId: widget.otherUser["uid"],
+      isTyping: false,
+    );
 
-  super.dispose();
-}
-  
+    messageController.dispose();
+    _scrollController.dispose();
+    _focusNode.dispose();
+
+    super.dispose();
+  }
 
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
