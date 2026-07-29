@@ -40,10 +40,10 @@ class ImageMessage extends StatelessWidget {
                 return child;
               }
 
-              return SizedBox(
+              return const SizedBox(
                 width: 220,
                 height: 220,
-                child: const Center(
+                child: Center(
                   child: CircularProgressIndicator(),
                 ),
               );
