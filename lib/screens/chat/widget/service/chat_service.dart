@@ -2,98 +2,25 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class ChatService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore =
+      FirebaseFirestore.instance;
 
+  final FirebaseAuth _auth =
+      FirebaseAuth.instance;
+
+  /// Generate Chat ID
   String getChatId(String otherUserId) {
-    final currentUid = _auth.currentUser!.uid;
+    final currentUserId = _auth.currentUser!.uid;
 
-    final ids = [currentUid, otherUserId]..sort();
+    if (currentUserId.hashCode <= otherUserId.hashCode) {
+      return "${currentUserId}_$otherUserId";
+    }
 
-    return ids.join("_");
+    return "${otherUserId}_$currentUserId";
   }
 
-Future<void> setTyping({
-  required String otherUserId,
-  required bool isTyping,
-}) async {
-  final currentUid = _auth.currentUser!.uid;
-  final chatId = getChatId(otherUserId);
-
-  final docRef = _firestore.collection("chats").doc(chatId);
-
-  await docRef.set({
-    "typing.$currentUid": isTyping,
-  }, SetOptions(merge: true));
-
-  final doc = await docRef.get();
-  print("Document Data: ${doc.data()}");
-}
-Stream<bool> getTypingStatus(String otherUserId) {
-  final chatId = getChatId(otherUserId);
-
-  return _firestore
-      .collection("chats")
-      .doc(chatId)
-      .snapshots()
-      .map((doc) {
-    if (!doc.exists) return false;
-
-    final data = doc.data()!;
-
-    // Read the flat Firestore field
-    return data["typing.$otherUserId"] ?? false;
-  });
-}
-  Future<void> sendMessage({
-    required String otherUserId,
-    required String text,
-    Map<String, dynamic>? replyToMessage,
-    String? replyToSender,
-  }) async {
-    if (text.trim().isEmpty) return;
-
-    final currentUid = _auth.currentUser!.uid;
-    final chatId = getChatId(otherUserId);
-
-    final chatRef = _firestore.collection("chats").doc(chatId);
-
-    final messageRef = chatRef.collection("messages").doc();
-
-    final batch = _firestore.batch();
-    batch.set(
-      chatRef,
-      {
-        "participants": [currentUid, otherUserId],
-        "lastMessage": text.trim(),
-        "lastMessageTime": FieldValue.serverTimestamp(),
-        "createdAt": FieldValue.serverTimestamp(),
-      },
-      SetOptions(merge: true),
-    );
-
-    batch.set(messageRef, {
-      "senderId": currentUid,
-      "receiverId": otherUserId,
-      "text": text.trim(),
-      "timestamp": FieldValue.serverTimestamp(),
-      "isRead": false,
-      "readAt": null,
-      "isDeleted": false,
-      "deletedAt": null,
-      "deletedFor": {},
-      "replyTo": null,
-      "reactions": {},
-      "isEdited": false,
-      "replyToMessage": replyToMessage,
-      "replyToSender": replyToSender,
-    });
-
-    await batch.commit();
-    print("Message Sent Successfully");
-  }
-
-  Stream<QuerySnapshot<Map<String, dynamic>>> getMessages(
+  /// Stream Messages
+  Stream<QuerySnapshot> getMessages(
     String otherUserId,
   ) {
     final chatId = getChatId(otherUserId);
@@ -102,38 +29,182 @@ Stream<bool> getTypingStatus(String otherUserId) {
         .collection("chats")
         .doc(chatId)
         .collection("messages")
-        .orderBy("timestamp", descending: true)
+        .orderBy(
+          "timestamp",
+          descending: false,
+        )
         .snapshots();
   }
 
-  Future<void> markMessagesAsRead(String otherUserId) async {
-    final currentUid = _auth.currentUser!.uid;
+  /// Send Text Message
+  Future<void> sendMessage({
+    required String receiverId,
+    required String text,
+    Map<String, dynamic>? replyMessage,
+  }) async {
+    final senderId = _auth.currentUser!.uid;
 
-    final chatId = getChatId(otherUserId);
+    final chatId = getChatId(receiverId);
 
-    final snapshot = await _firestore
+    final messageRef = _firestore
         .collection("chats")
         .doc(chatId)
         .collection("messages")
-        .where("receiverId", isEqualTo: currentUid)
-        .where("isRead", isEqualTo: false)
-        .get();
+        .doc();
 
-    if (snapshot.docs.isEmpty) return;
+    final message = {
+      "id": messageRef.id,
+      "senderId": senderId,
+      "receiverId": receiverId,
+      "type": "text",
+      "text": text,
+      "imageUrl": "",
+      "voiceUrl": "",
+      "fileUrl": "",
+      "fileName": "",
+      "voiceDuration": 0,
+      "replyToMessage": replyMessage,
+      "reactions": [],
+      "isRead": false,
+      "timestamp": FieldValue.serverTimestamp(),
+    };
 
-    final batch = _firestore.batch();
+    await messageRef.set(message);
 
-    for (final doc in snapshot.docs) {
-      batch.update(doc.reference, {
-        "isRead": true,
-        "readAt": FieldValue.serverTimestamp(),
-      });
-    }
-
-    await batch.commit();
+    await _firestore
+        .collection("chats")
+        .doc(chatId)
+        .set({
+      "participants": [
+        senderId,
+        receiverId,
+      ],
+      "lastMessage": text,
+      "lastMessageType": "text",
+      "lastMessageTime":
+          FieldValue.serverTimestamp(),
+      "createdAt":
+          FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
   }
 
-  Future<void> deleteForEveryone({
+  /// Send Image Message
+  Future<void> sendImageMessage({
+    required String receiverId,
+    required String imageUrl,
+    Map<String, dynamic>? replyMessage,
+  }) async {
+    final senderId = _auth.currentUser!.uid;
+
+    final chatId = getChatId(receiverId);
+
+    final messageRef = _firestore
+        .collection("chats")
+        .doc(chatId)
+        .collection("messages")
+        .doc();
+
+    final message = {
+      "id": messageRef.id,
+      "senderId": senderId,
+      "receiverId": receiverId,
+      "type": "image",
+      "text": "",
+      "imageUrl": imageUrl,
+      "voiceUrl": "",
+      "fileUrl": "",
+      "fileName": "",
+      "voiceDuration": 0,
+      "replyToMessage": replyMessage,
+      "reactions": [],
+      "isRead": false,
+      "timestamp": FieldValue.serverTimestamp(),
+    };
+
+    await messageRef.set(message);
+
+    await _firestore
+        .collection("chats")
+        .doc(chatId)
+        .set({
+      "participants": [
+        senderId,
+        receiverId,
+      ],
+      "lastMessage": "📷 Photo",
+      "lastMessageType": "image",
+      "lastMessageTime":
+          FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+    /// Send Voice Message
+  Future<void> sendVoiceMessage({
+    required String receiverId,
+    required String voiceUrl,
+    required int duration,
+    Map<String, dynamic>? replyMessage,
+  }) async {
+    final senderId = _auth.currentUser!.uid;
+
+    final chatId = getChatId(receiverId);
+
+    final messageRef = _firestore
+        .collection("chats")
+        .doc(chatId)
+        .collection("messages")
+        .doc();
+
+    final message = {
+      "id": messageRef.id,
+      "senderId": senderId,
+      "receiverId": receiverId,
+      "type": "voice",
+      "text": "",
+      "imageUrl": "",
+      "voiceUrl": voiceUrl,
+      "voiceDuration": duration,
+      "fileUrl": "",
+      "fileName": "",
+      "replyToMessage": replyMessage,
+      "reactions": [],
+      "isRead": false,
+      "timestamp": FieldValue.serverTimestamp(),
+    };
+
+    await messageRef.set(message);
+
+    await _firestore
+        .collection("chats")
+        .doc(chatId)
+        .set({
+      "participants": [
+        senderId,
+        receiverId,
+      ],
+      "lastMessage": "🎤 Voice message",
+      "lastMessageType": "voice",
+      "lastMessageTime":
+          FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  /// Delete Message
+  Future<void> deleteMessage(
+    String otherUserId,
+    String messageId,
+  ) async {
+    final chatId = getChatId(otherUserId);
+
+    await _firestore
+        .collection("chats")
+        .doc(chatId)
+        .collection("messages")
+        .doc(messageId)
+        .delete();
+  }
+
+  /// Read Receipt
+  Future<void> markAsRead({
     required String otherUserId,
     required String messageId,
   }) async {
@@ -145,87 +216,43 @@ Stream<bool> getTypingStatus(String otherUserId) {
         .collection("messages")
         .doc(messageId)
         .update({
-      "isDeleted": true,
-      "text": "This message was deleted",
-      "deletedAt": FieldValue.serverTimestamp(),
+      "isRead": true,
     });
   }
 
-  Future<void> deleteForMe({
-    required String otherUserId,
-    required String messageId,
-  }) async {
-    final currentUid = _auth.currentUser!.uid;
-
-    final chatId = getChatId(otherUserId);
+  /// Typing Status
+  Future<void> setTyping(
+    String otherUserId,
+    bool typing,
+  ) async {
+    final currentUserId = _auth.currentUser!.uid;
 
     await _firestore
-        .collection("chats")
-        .doc(chatId)
-        .collection("messages")
-        .doc(messageId)
-        .update({
-      "deletedFor.$currentUid": true,
-    });
-
-    Future<void> markMessagesAsRead(String otherUserId) async {
-      final currentUid = _auth.currentUser!.uid;
-
-      final chatId = getChatId(otherUserId);
-
-      final snapshot = await _firestore
-          .collection("chats")
-          .doc(chatId)
-          .collection("messages")
-          .where("receiverId", isEqualTo: currentUid)
-          .where("isRead", isEqualTo: false)
-          .get();
-
-      final batch = _firestore.batch();
-
-      for (final doc in snapshot.docs) {
-        batch.update(doc.reference, {
-          "isRead": true,
-        });
-      }
-
-      await batch.commit();
-    }
-
-    Future<void> deleteForEveryone({
-      required String otherUserId,
-      required String messageId,
-    }) async {
-      final chatId = getChatId(otherUserId);
-
-      await _firestore
-          .collection("chats")
-          .doc(chatId)
-          .collection("messages")
-          .doc(messageId)
-          .update({
-        "isDeleted": true,
-        "text": "This message was deleted",
-        "deletedAt": FieldValue.serverTimestamp(),
-      });
-    }
-
-    Future<void> deleteForMe({
-      required String otherUserId,
-      required String messageId,
-    }) async {
-      final currentUid = _auth.currentUser!.uid;
-
-      final chatId = getChatId(otherUserId);
-
-      await _firestore
-          .collection("chats")
-          .doc(chatId)
-          .collection("messages")
-          .doc(messageId)
-          .update({
-        "deletedFor.$currentUid": true,
-      });
-    }
+        .collection("typing")
+        .doc(otherUserId)
+        .set({
+      currentUserId: typing,
+    }, SetOptions(merge: true));
   }
+
+  /// Listen Typing Status
+  Stream<bool> getTypingStatus(
+    String otherUserId,
+  ) {
+    final currentUserId = _auth.currentUser!.uid;
+
+    return _firestore
+        .collection("typing")
+        .doc(currentUserId)
+        .snapshots()
+        .map((snapshot) {
+      if (!snapshot.exists) return false;
+
+      final data = snapshot.data();
+
+      return data?[otherUserId] ?? false;
+    });
+  }
+
+  /// Edit Message
 }

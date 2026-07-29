@@ -29,8 +29,8 @@ class ChatCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => ChatScreen(
-                otherUser: user,
+              builder: (_) => ChatScreen(otherUserId: user["uid"],
+otherUserName: user["name"],
               ),
             ),
           );

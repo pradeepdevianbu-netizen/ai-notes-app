@@ -225,7 +225,8 @@ class _StudentCardState extends State<StudentCard> {
                             context,
                             MaterialPageRoute(
                               builder: (_) => ChatScreen(
-                                otherUser: widget.student,
+            otherUserId: widget.student["uid"],
+            otherUserName: widget.student["name"],
                               ),
                             ),
                           );
