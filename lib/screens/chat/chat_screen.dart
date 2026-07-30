@@ -103,7 +103,7 @@ class _ChatScreenState extends State<ChatScreen> {
             Text(
               widget.otherUserName,
               style: const TextStyle(
-                fontSize: 17,
+                fontSize: 18,
                 fontWeight: FontWeight.w500,
               ),
             ),
