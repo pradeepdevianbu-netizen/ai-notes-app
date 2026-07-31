@@ -13,8 +13,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class ChatScreen extends StatefulWidget {
   final String otherUserId;
   final String otherUserName;
+  final ScrollController _scrollController = ScrollController();
 
-  const ChatScreen({
+   ChatScreen({
     super.key,
     required this.otherUserId,
     required this.otherUserName,
@@ -28,6 +29,8 @@ class _ChatScreenState extends State<ChatScreen> {
   final ChatService _chatService = ChatService();
 
   final TextEditingController messageController = TextEditingController();
+  final ScrollController _scrollController =
+      ScrollController();
 
   final String currentUid = FirebaseAuth.instance.currentUser!.uid;
 
@@ -84,17 +87,17 @@ class _ChatScreenState extends State<ChatScreen> {
         current.year != previous.year;
   }
 
-  @override
-  void dispose() {
-    messageController.dispose();
-
-    super.dispose();
-  }
+ @override
+void dispose() {
+  messageController.dispose();
+  _scrollController.dispose();
+  super.dispose();
+}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:  const Color.fromARGB(255, 17, 89, 68),
+      backgroundColor: const Color.fromARGB(255, 17, 89, 68),
       appBar: AppBar(
         backgroundColor: const Color(0xff075E54),
         title: Column(
@@ -151,11 +154,20 @@ class _ChatScreenState extends State<ChatScreen> {
 
                   DateTime? previousDate;
 
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (_scrollController.hasClients) {
+                      _scrollController.jumpTo(
+                        _scrollController.position.maxScrollExtent,
+                      );
+                    }
+                  });
+
                   return ListView.builder(
-                    reverse: true,
-                    padding: const EdgeInsets.only(
-                      top: 10,
-                      bottom: 10,
+                    controller: _scrollController,
+                    reverse: false,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 10,
                     ),
                     itemCount: docs.length,
                     itemBuilder: (context, index) {
