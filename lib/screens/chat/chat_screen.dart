@@ -211,7 +211,7 @@ void dispose() {
                                 widget.otherUserId,
                                 doc.id,
                               );
-                            },
+                            }, senderName:'flutter run',
                           ),
                         ],
                       );

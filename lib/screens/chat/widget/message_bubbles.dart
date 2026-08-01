@@ -6,18 +6,22 @@ class MessageBubble extends StatelessWidget {
   final Map<String, dynamic> message;
   final bool isMe;
 
+  final String senderName;
+
   final VoidCallback? onReply;
   final VoidCallback? onDelete;
   final VoidCallback? onCopy;
 
-  const MessageBubble({
-    super.key,
-    required this.message,
-    required this.isMe,
-    this.onReply,
-    this.onDelete,
-    this.onCopy,
-  });
+const MessageBubble({
+  super.key,
+  required this.message,
+  required this.isMe,
+  required this.senderName,
+  this.onReply,
+  this.onDelete,
+  this.onCopy,
+});
+  
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +87,16 @@ class MessageBubble extends StatelessWidget {
               crossAxisAlignment:
                   CrossAxisAlignment.start,
               children: [
+ Text(
+      isMe ? "You" : senderName,
+      style: const TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: Colors.white60,
+      ),
+    ),
 
+    const SizedBox(height: 4),
                 /// Reply Preview
                 if (reply != null)
                   Container(
