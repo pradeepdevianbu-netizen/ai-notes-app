@@ -115,7 +115,7 @@ void dispose() {
               builder: (context, snapshot) {
                 if (snapshot.data == true) {
                   return const Text(
-                    "typing...",
+                    "typing..",
                     style: TextStyle(
                       fontSize: 12,
                     ),
